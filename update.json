@@ -1,5 +1,6 @@
 {
-  "versionCode": 35,
-  "versionName": "1.7.4",
-  "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk"
+  "versionCode": 36,
+  "versionName": "1.8.0",
+  "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
+  "notes": "1.8.0: исправлены падения фоновых сервисов, утечка ключей из резервной копии, дубли реплик в чате, залипание озвучки, скрытая история в панели и ещё 30 подтверждённых багов"
 }
