@@ -1,6 +1,6 @@
 {
-  "versionCode": 48,
-  "versionName": "1.9.2",
+  "versionCode": 49,
+  "versionName": "1.9.3",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.9.2: кнопка «Чат» в голосовой панели — из долгого нажатия кнопки питания можно уйти в текстовый чат того же диалога"
+  "notes": "1.9.3: телефон больше не переключает режим звонка при прослушке, выбранный голос действительно звучит, меньше щелчков"
 }
