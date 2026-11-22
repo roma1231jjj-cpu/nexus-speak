@@ -1,6 +1,6 @@
 {
-  "versionCode": 47,
-  "versionName": "1.9.1",
+  "versionCode": 48,
+  "versionName": "1.9.2",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.9.1: глушим и TTS/«ассистент»-поток, окно тишины 2 секунды вместо постоянного, длинные сессии прослушки — «дзынь» реже"
+  "notes": "1.9.2: кнопка «Чат» в голосовой панели — из долгого нажатия кнопки питания можно уйти в текстовый чат того же диалога"
 }
