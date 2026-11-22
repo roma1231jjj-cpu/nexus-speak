@@ -1,6 +1,6 @@
 {
-  "versionCode": 51,
-  "versionName": "1.9.5",
+  "versionCode": 52,
+  "versionName": "1.9.6",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.9.5: во время звонка приложение больше не переключает аудиорежим — разговор остаётся в трубке"
+  "notes": "1.9.6: Edge-голос из России недоступен (403) — приложение говорит голосом движка и прямо об этом пишет в настройках"
 }
