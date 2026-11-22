@@ -8,7 +8,25 @@
   <img src="docs/chat.png" width="32%" alt="Чат" />
 </p>
 
-## Установка
+## English
+
+**Nexus Speak** is a Russian-speaking voice assistant for Android. Say the wake word «Нэксус» and talk — it answers out loud, keeps the conversation, and can control the phone. Any OpenAI-compatible LLM provider works.
+
+- Wake word, hands-free voice mode, streaming answers spoken while they arrive.
+- Android Assistant integration: it can take over the long-press assistant gesture.
+- Text chat with history, per-dialog memory, voice and cloud TTS (Microsoft Edge neural voices, Google, ElevenLabs, Yandex SpeechKit).
+- Phone control tools: timers, alarms, calls, messages, volume, flashlight, app launch.
+- Bring your own key: no key, no provider and no telemetry inside the build.
+
+**Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. Android 13+ is recommended.
+
+**Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
+
+**Build:** JDK 17, Android SDK, `gradle assembleRelease`. The APK is signed with a debug key for distribution as a side-loaded build.
+
+The rest of this README is in Russian — ask in the issues if you need an English guide for a specific screen.
+
+## Установка (по-русски)
 
 1. Скачай **[Nexus.apk](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest)** (или из [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases)).
 2. Разреши установку из неизвестных источников и поставь APK.
