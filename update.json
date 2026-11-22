@@ -1,6 +1,6 @@
 {
-  "versionCode": 45,
-  "versionName": "1.8.9",
+  "versionCode": 46,
+  "versionName": "1.9.0",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.8.9: без «пилипов», озвучка без задержек, панель закрывается после ответа, переписан системный промпт"
+  "notes": "1.9.0: глушим «дзынь» и в медиа-потоке (музыка не глохнет), при смене темы прокрутка не сбрасывается"
 }
