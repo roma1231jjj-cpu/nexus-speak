@@ -1,6 +1,6 @@
 {
-  "versionCode": 50,
-  "versionName": "1.9.4",
+  "versionCode": 51,
+  "versionName": "1.9.5",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.9.4: в настройках видно, кто реально говорит — облако или голос движка, и предупреждение, если облако перебивает выбранный голос"
+  "notes": "1.9.5: во время звонка приложение больше не переключает аудиорежим — разговор остаётся в трубке"
 }
