@@ -1,6 +1,6 @@
 {
-  "versionCode": 52,
-  "versionName": "1.9.6",
+  "versionCode": 53,
+  "versionName": "1.10.0",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.9.6: Edge-голос из России недоступен (403) — приложение говорит голосом движка и прямо об этом пишет в настройках"
+  "notes": "1.10.0: двуязычный интерфейс RU/EN — переключатель «Язык / Language» в настройках, без перезапуска приложения. English UI included: switch in Settings."
 }

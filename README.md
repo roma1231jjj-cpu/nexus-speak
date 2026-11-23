@@ -12,6 +12,8 @@
 
 **Nexus Speak** is a Russian-speaking voice assistant for Android. Say the wake word «Нэксус» and talk — it answers out loud, keeps the conversation, and can control the phone. Any OpenAI-compatible LLM provider works.
 
+**The interface is bilingual (Russian / English).** Open Settings → «Язык / Language» → **English** and the whole app — main screen, assistant panel, chat, settings, notifications and toasts — switches immediately, no restart. On first launch the app follows the system language: Russian if the phone is Russian, English otherwise.
+
 - Wake word, hands-free voice mode, streaming answers spoken while they arrive.
 - Android Assistant integration: it can take over the long-press assistant gesture.
 - Text chat with history, per-dialog memory, voice and cloud TTS (Microsoft Edge neural voices, Google, ElevenLabs, Yandex SpeechKit).
@@ -21,6 +23,8 @@
 **Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. Android 13+ is recommended.
 
 **Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
+
+**Language:** Settings → «Язык / Language» — Русский / English. The choice is saved and applied instantly (`recreate()`), no app restart, no re-login. Voice recognition and TTS stay on the system languages — the switch only changes the UI, so a Russian voice engine keeps speaking Russian.
 
 **Build:** JDK 17, Android SDK, `gradle assembleRelease`. The APK is signed with a debug key for distribution as a side-loaded build.
 
@@ -137,6 +141,13 @@ Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
 - Токены тратятся на каждый запрос, включая шутки и погоду.
 
 ## Что нового
+
+**1.10.0 — двуязычный интерфейс RU / EN**
+- в настройках появился блок **«Язык / Language» — Русский / English**. Переключение мгновенное: экран пересоздаётся, позиция прокрутки настроек сохраняется, приложение перезапускать не нужно.
+- переведено всё, что видно человеку: экран настроек целиком (голос, модели и API, характер, автоответчик, макросы, обновления), главный экран, панель ассистента со статусами («Слушаю…», «Думаю…», «Говорю…»), чат и история диалогов, диалоги выбора, тосты, уведомления в шторке и плитка быстрых настроек.
+- переводы лежат отдельным словарём `assets/i18n_en.json`, тексты экранов подхватываются на лету при открытии — новые строки можно добавлять без правки разметки.
+- по умолчанию язык берётся из системы: русский телефон — русский интерфейс, любой другой — английский. Выбор запоминается в настройках.
+- имена технологий и провайдеров (OpenAI, Edge, ElevenLabs, Gemini, DeepSeek, SpeechKit) не переводятся. Распознавание речи и синтез остались как были — переключатель меняет только интерфейс.
 
 **1.9.6 — честно про голос**
 - если нейроголос Edge недоступен (в России сервер отвечает 403), приложение больше не тратит по 12 секунд на каждую фразу: блокировка запоминается на сутки.
