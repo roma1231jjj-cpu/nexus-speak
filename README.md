@@ -8,6 +8,12 @@
   <img src="docs/chat.png" width="32%" alt="Чат" />
 </p>
 
+**Английский интерфейс и три темы / English UI and three themes**
+
+| Midnight | Frost | Graphite |
+|---|---|---|
+| <img src="docs/en-settings-midnight.png" width="240" alt="Midnight settings" /> | <img src="docs/en-settings-frost.png" width="240" alt="Frost settings" /> | <img src="docs/en-main-graphite.png" width="240" alt="Graphite main screen" /> |
+
 ## English
 
 **Nexus Speak** is a Russian-speaking voice assistant for Android. Say the wake word «Нэксус» and talk — it answers out loud, keeps the conversation, and can control the phone. Any OpenAI-compatible LLM provider works.
@@ -23,6 +29,8 @@
 **Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. Android 13+ is recommended.
 
 **Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
+
+**Screenshots above** are the app itself: Settings in Midnight, Settings in Frost and the main screen in Graphite, interface switched to English.
 
 **Themes:** three named palettes, switched in Settings → «Тема / Theme» — **Midnight** (black + violet #8B5CF6), **Frost** (white + blue #2563EB) and **Graphite** (graphite + mint #46D39A). The choice is applied instantly with `recreate()`, never restarts the app, and follows the whole interface: main screen, assistant panel, chat, settings, dialogs, status bar and system widget tints.
 
@@ -144,6 +152,11 @@ Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
 - Токены тратятся на каждый запрос, включая шутки и погоду.
 
 ## Что нового
+
+**1.10.2 — одинаковый вид на всех Android и английские скриншоты**
+- фоновые блики темы и «стеклянные» карточки больше не собираются из XML-градиента с цветами темы: такие градиенты поддерживаются не всеми прошивками, и на старых версиях Android экран просто падал при открытии (`Resources$NotFoundException: drawable/bg_blobs`). Теперь блики рисуются кодом (`NxBlobs`), а карточка — слой с заливкой из темы плюс светлый блик сверху. Вид тот же, а падений нет.
+- три скриншота интерфейса на английском: настройки в «Полночи», настройки в «Инее», главный экран в «Графите».
+- релизная сборка по-прежнему требует Android 13+, сборка `-Plowapi` нужна только для проверки на старом эмуляторе.
 
 **1.10.1 — три темы и переключатель рядом с языком**
 - в настройках появился блок **«Тема / Theme»** сразу под языком: **Полночь / Midnight** (чёрный + фиолетовый #8B5CF6), **Иней / Frost** (белый + синий #2563EB), **Графит / Graphite** (графит + мята #46D39A).
