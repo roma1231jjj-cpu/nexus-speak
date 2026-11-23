@@ -1,6 +1,6 @@
 {
-  "versionCode": 53,
-  "versionName": "1.10.0",
+  "versionCode": 54,
+  "versionName": "1.10.1",
   "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "notes": "1.10.0: двуязычный интерфейс RU/EN — переключатель «Язык / Language» в настройках, без перезапуска приложения. English UI included: switch in Settings."
+  "notes": "1.10.1: три именованные темы — Полночь (чёрный + фиолетовый), Иней (белый + синий), Графит (графит + мята) и переключатель «Тема / Theme» рядом с языком. Тема применяется сразу, без перезапуска. Themes: Midnight / Frost / Graphite."
 }

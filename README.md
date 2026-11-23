@@ -24,6 +24,8 @@
 
 **Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
 
+**Themes:** three named palettes, switched in Settings → «Тема / Theme» — **Midnight** (black + violet #8B5CF6), **Frost** (white + blue #2563EB) and **Graphite** (graphite + mint #46D39A). The choice is applied instantly with `recreate()`, never restarts the app, and follows the whole interface: main screen, assistant panel, chat, settings, dialogs, status bar and system widget tints.
+
 **Language:** Settings → «Язык / Language» — Русский / English. The choice is saved and applied instantly (`recreate()`), no app restart, no re-login. Voice recognition and TTS stay on the system languages — the switch only changes the UI, so a Russian voice engine keeps speaking Russian.
 
 **Build:** JDK 17, Android SDK, `gradle assembleRelease`. The APK is signed with a debug key for distribution as a side-loaded build.
@@ -96,7 +98,8 @@ Polza.ai · OpenRouter · OpenAI · DeepSeek · Groq · Mistral · Together AI �
 - Учёт расходов за день.
 
 ### Внешний вид
-- Тёмная, светлая и системная темы + **AMOLED** (чистый чёрный).
+- Три именованные темы, переключатель в настройках рядом с языком: **Полночь** (чёрный + фиолетовый #8B5CF6), **Иней** (белый + синий #2563EB), **Графит** (графит + мята #46D39A). Плюс **AMOLED** — чистый чёрный поверх «Полночи».
+- Цвета живут в атрибутах темы, поэтому все экраны, стеклянные карточки, пузыри чата, диалоги, статус-бар и иконки системных виджетов меняются вместе с темой — без перезапуска и без отдельной разметки на каждую тему.
 - Живой 2.5D-глобус, плавающие орбы с настоящими логотипами провайдеров (Anthropic, OpenAI, Gemini, DeepSeek, Kimi, Grok, Mistral, Qwen).
 - Настройки — отдельным экраном, главный экран короткий: статус, «Голос», «Чат».
 
@@ -141,6 +144,12 @@ Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
 - Токены тратятся на каждый запрос, включая шутки и погоду.
 
 ## Что нового
+
+**1.10.1 — три темы и переключатель рядом с языком**
+- в настройках появился блок **«Тема / Theme»** сразу под языком: **Полночь / Midnight** (чёрный + фиолетовый #8B5CF6), **Иней / Frost** (белый + синий #2563EB), **Графит / Graphite** (графит + мята #46D39A).
+- палитры лежат в атрибутах темы (`nxBg`, `nxPrimary`, `nxTextMain` и т.д.), а не в коде экранов: главный экран, панель ассистента, чат, настройки, диалоги выбора, стеклянные карточки, пузыри и статус-бар берут цвет из темы. Ночь/день под системные настройки больше не нужны — тема одна и именованная.
+- выбор сохраняется в настройках (`theme`) и применяется мгновенно через `recreate()` с сохранением позиции прокрутки — как у переключателя языка.
+- «Иней» светлый: тёмные иконки статус-бара и навигации, синие акценты, читаемый текст. «AMOLED» остался и работает поверх «Полночи»; при выборе «Инея» он сам выключается.
 
 **1.10.0 — двуязычный интерфейс RU / EN**
 - в настройках появился блок **«Язык / Language» — Русский / English**. Переключение мгновенное: экран пересоздаётся, позиция прокрутки настроек сохраняется, приложение перезапускать не нужно.
