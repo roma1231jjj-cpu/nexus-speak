@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/nxBg">
+
+    <com.local.aivoice.FloatingOrbsView
+        android:id="@+id/orbsView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ScrollView
+        android:id="@+id/mainScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/mainContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.local.aivoice.GlobeView
+                    android:id="@+id/headerGlobe"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nexus Speak"
+                        android:textColor="?attr/nxTextMain"
+                        android:textSize="29sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/defaultStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/nxTextDim"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/wakePill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/pill_bg"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:textColor="?attr/nxTextMain"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/sttStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="?attr/nxTextDim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/providerLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="?attr/nxTextDim"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+            app:backgroundTint="@null"
+                        android:id="@+id/voiceModeBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="88dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_mic"
+                        android:text="Голос"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/nxOnPrimary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <Button
+            app:backgroundTint="@null"
+                        android:id="@+id/chatModeBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="88dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_ghost"
+                        android:text="Чат"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/nxTextMain"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/settingsBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Настройки"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/setDefaultBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Сделать помощником по умолчанию"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/newDialogBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Новый диалог"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/crashView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_field"
+                android:padding="10dp"
+                android:textColor="?attr/nxDanger"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

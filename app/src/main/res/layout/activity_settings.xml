@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/nxBg">
+
+    <ScrollView
+        android:id="@+id/settingsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/backBtn"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_gear"
+                    android:contentDescription="Назад"
+                    android:src="@drawable/ic_back"
+                    app:tint="?attr/nxTextMain" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Настройки"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Язык -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Язык / Language" />
+
+                <RadioGroup
+                    android:id="@+id/langGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/langRu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Русский"
+                        android:textColor="?attr/nxTextMain" />
+
+                    <RadioButton
+                        android:id="@+id/langEn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="English"
+                        android:textColor="?attr/nxTextMain" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- Тема -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Тема / Theme" />
+
+                <RadioGroup
+                    android:id="@+id/themeGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/themeMidnight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="44dp"
+                        android:text="Полночь"
+                        android:textColor="?attr/nxTextMain" />
+
+                    <RadioButton
+                        android:id="@+id/themeFrost"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="44dp"
+                        android:text="Иней"
+                        android:textColor="?attr/nxTextMain" />
+
+                    <RadioButton
+                        android:id="@+id/themeGraphite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="44dp"
+                        android:text="Графит"
+                        android:textColor="?attr/nxTextMain" />
+                </RadioGroup>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Полночь — чёрный и фиолетовый, Иней — белый и синий, Графит — графит и мята. Переключается сразу."
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Ассистент -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Ассистент" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/keepScreenCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Не выключать экран в ассистенте"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/voiceVolumeSeek"
+                    android:text="Громкость голоса Нексуса" />
+
+                <SeekBar
+                    android:id="@+id/voiceVolumeSeek"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:progress="100" />
+
+                <TextView
+                    android:id="@+id/voiceVolumeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Сколько ждать продолжения после ответа" />
+
+                <TextView
+                    android:id="@+id/talkWindowSel"
+                    style="@style/Selector" />
+
+
+                <TextView
+                    android:id="@+id/voiceHeader"
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Чем говорит Нэксус" />
+
+                <TextView
+                    android:id="@+id/cloudSel"
+                    style="@style/Selector" />
+
+                <LinearLayout
+                    android:id="@+id/deviceVoiceBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Движок телефона" />
+
+                    <TextView
+                        android:id="@+id/ttsSel"
+                        style="@style/Selector" />
+
+                    <TextView
+                        android:id="@+id/voiceLabel"
+                        style="@style/FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Голос" />
+
+                    <TextView
+                        android:id="@+id/voiceSel"
+                        style="@style/Selector" />
+
+                    <TextView
+                        android:id="@+id/rateLabel"
+                        style="@style/FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Скорость речи" />
+
+                    <TextView
+                        android:id="@+id/rateSel"
+                        style="@style/Selector" />
+
+                    <TextView
+                        android:id="@+id/pitchLabel"
+                        style="@style/FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Тон" />
+
+                    <TextView
+                        android:id="@+id/pitchSel"
+                        style="@style/Selector" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/cloudVoiceLabel"
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Голос" />
+
+                <TextView
+                    android:id="@+id/cloudVoiceSel"
+                    style="@style/Selector" />
+
+                <TextView
+                    android:id="@+id/cloudKeyLabel"
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="API-ключ" />
+
+                <EditText
+                    android:id="@+id/cloudKeyEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/glass_field"
+                    android:padding="13dp"
+                    android:layout_marginTop="6dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim"
+                    android:textSize="14sp"
+                    android:hint="вставь ключ сервиса"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:id="@+id/cloudUrlLabel"
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Адрес API (для OpenAI-совместимых)" />
+
+                <EditText
+                    android:id="@+id/cloudUrlEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/glass_field"
+                    android:padding="13dp"
+                    android:layout_marginTop="6dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim"
+                    android:textSize="14sp"
+                    android:hint="https://api.openai.com/v1"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:id="@+id/cloudHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+
+                <Button
+                    app:backgroundTint="@null"
+                    android:id="@+id/testVoiceBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Проверить голос"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    android:id="@+id/voiceTestStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Помощник по умолчанию -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/assistantState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="14sp" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/assistantSettingsBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Открыть выбор помощника"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/chooserHelpBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Как назначить помощником"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+            </LinearLayout>
+
+            <!-- Wake -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Прослушка «Нексус»" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/wakeCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Слушать постоянно (и с выключенным экраном)"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    android:id="@+id/voskStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                
+                <TextView
+                    android:id="@+id/wakeLive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/restartWakeBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Перезапустить прослушку"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/testSttBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Проверить распознавание речи"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <Button
+                    app:backgroundTint="@null"
+                    android:id="@+id/batteryBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:textAllCaps="false"
+                    android:text="Отключить оптимизацию батареи"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Автономность и озвучка -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Автономность и озвучка" />
+
+                
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Плитка в шторке: «Нексус» — включает и выключает прослушку. Когда она включена, в шторке висит плашка с кнопками «Выключить» и «Настройки»."
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/announceNotifCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Читать входящие уведомления вслух"
+                    android:textColor="?attr/nxTextMain" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/announceCallsCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Называть, кто звонит"
+                    android:textColor="?attr/nxTextMain" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/announceQuietCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Тихие часы: не читать уведомления с 23:00 до 8:00"
+                    android:textColor="?attr/nxTextMain" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="10dp"
+                    android:background="?attr/nxGlassStroke" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/callAnswerCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Автоответчик на звонки (примет, поздоровается, положит трубку)"
+                    android:textColor="?attr/nxTextMain" />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/callSetupBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Настроить автоответчик"     android:textColor="?attr/nxOnPrimary"
+            />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/amoledCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="AMOLED: чистый чёрный фон (только тёмная тема)"
+                    android:textColor="?attr/nxTextMain" />
+            </LinearLayout>
+
+            <!-- Память о пользователе -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Память о тебе (постоянная)" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Эти факты Нексус помнит всегда: имя, город, распорядок, привычки, кто есть кто. Чем точнее — тем умнее ответы."
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/userInfoEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/glass_field"
+                    android:gravity="top"
+                    android:hint="Например: меня зовут Роман, живу в Москве. Урок гитары по вторникам в 9:40, дорога 15 минут. Дома спим в спальне."
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:padding="12dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim" />
+            </LinearLayout>
+
+            <!-- Макросы -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Макросы" />
+
+                <TextView
+                    android:id="@+id/macrosStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/macrosBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Управление макросами"     android:textColor="?attr/nxOnPrimary"
+            />
+            </LinearLayout>
+
+            <!-- AI -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Модели и API" />
+
+                <TextView
+                    android:id="@+id/modelCatalogStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/providerBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Выбрать провайдера"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    android:id="@+id/spendView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Главная модель (текст)" />
+
+                <TextView
+                    android:id="@+id/modelSel"
+                    style="@style/Selector" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Резервная текстовая (фолбэк)" />
+
+                <TextView
+                    android:id="@+id/textFbSel"
+                    style="@style/Selector" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vision-модель («что на экране»)" />
+
+                <TextView
+                    android:id="@+id/visionSel"
+                    style="@style/Selector" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Резервная vision (фолбэк)" />
+
+                <TextView
+                    android:id="@+id/visionFbSel"
+                    style="@style/Selector" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/visionCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Разрешить снимок экрана по команде"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    style="@style/FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="API (OpenAI-совместимый)" />
+
+                <EditText
+                    android:id="@+id/urlEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/glass_field"
+                    android:hint="URL, напр. https://polza.ai/api/v1"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim" />
+
+                <EditText
+                    android:id="@+id/keyEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/glass_field"
+                    android:hint="API-ключ"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim" />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/saveBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Сохранить"     android:textColor="?attr/nxOnPrimary"
+            />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/testBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Проверить API"     android:textColor="?attr/nxOnPrimary"
+            />
+            </LinearLayout>
+
+            <!-- Промпт -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Характер Нексуса (промпт)" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Выбери готовый или свой промпт. Системная инструкция и команды вшиты скрыто — их изменить нельзя."
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/templateSel"
+                    style="@style/Selector" />
+
+                <EditText
+                    android:id="@+id/systemEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/glass_field"
+                    android:gravity="top"
+                    android:hint="Текст персонажа: стиль, тон, обращение…"
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:padding="12dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim" />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/savePromptBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Сохранить как мой промпт…"     android:textColor="?attr/nxOnPrimary"
+            />
+            </LinearLayout>
+
+            <!-- Обновления -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Обновления" />
+
+                <CheckBox
+                    app:buttonTint="?attr/nxPrimary"
+                    android:minHeight="48dp"
+                    android:id="@+id/autoUpdateCb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Проверять при входе (спросит перед скачиванием)"
+                    android:textColor="?attr/nxTextMain" />
+
+                <TextView
+                    android:id="@+id/updateStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="13sp" />
+
+                <EditText
+                    android:id="@+id/updateUrlEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/glass_field"
+                    android:hint="URL списка обновлений (update.json)"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:textColor="?attr/nxTextMain"
+                    android:textColorHint="?attr/nxTextDim" />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/checkUpdateBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Проверить обновления"     android:textColor="?attr/nxOnPrimary"
+            />
+            </LinearLayout>
+
+            <!-- Прочее -->
+            <LinearLayout style="@style/GlassCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="Прочее" />
+
+                <Button
+            app:backgroundTint="@null"
+                    android:id="@+id/capabilitiesBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:text="Проверить доступ к телефону"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/nxTextMain" />
+
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/notifBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Разрешить чтение уведомлений"     android:textColor="?attr/nxOnPrimary"
+            />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/exportBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Экспорт настроек (поделиться файлом)"     android:textColor="?attr/nxOnPrimary"
+            />
+
+                <Button
+            android:textAllCaps="false"
+                    android:id="@+id/importBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Импорт настроек (выбрать файл)"     android:textColor="?attr/nxOnPrimary"
+            />
+
+                <TextView
+                    android:id="@+id/crashView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/glass_field"
+                    android:padding="10dp"
+                    android:textColor="?attr/nxDanger"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

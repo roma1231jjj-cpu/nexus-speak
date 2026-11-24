@@ -301,3 +301,13 @@ Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
 **1.2.0** — AMOLED, автоответчик на звонки.
 
 **1.1.0** — чат и голос, стриминг, сессии, память, макросы, плитка в шторке.
+
+## Сборка из исходников
+
+Проект целиком лежит в этом репозитории: `app/` — Android-приложение (Java, Gradle 8.10), `docs/` — скриншоты, `update.json` — манифест автообновления.
+
+```bash
+gradle assembleRelease        # APK в app/build/outputs/apk/release/
+```
+
+Нужен Android SDK и JDK 17. Готовые сборки — в разделе Releases.

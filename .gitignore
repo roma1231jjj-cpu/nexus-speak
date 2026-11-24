@@ -1,2 +1,10 @@
-push.log
-push_retry.sh
+.gradle/
+build/
+app/build/
+gradle/
+local.properties
+*.iml
+.idea/
+.kotlin/
+captures/
+*.log

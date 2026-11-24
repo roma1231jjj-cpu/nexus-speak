@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/nxBg">
+
+    <!-- живой фон: логотипы провайдеров летают вокруг глобуса -->
+    <com.local.aivoice.FloatingOrbsView
+        android:id="@+id/chatOrbs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.local.aivoice.GlobeView
+        android:id="@+id/chatGlobe"
+        android:layout_width="330dp"
+        android:layout_height="330dp"
+        android:layout_gravity="center"
+        android:alpha="0.30" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp">
+
+            <ImageButton
+                android:id="@+id/chatBackBtn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_gear"
+                android:contentDescription="Меню Нексуса"
+                android:src="@drawable/ic_menu"
+                app:tint="?attr/nxTextMain" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/chatTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="Нэксус"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/chatState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="онлайн"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/chatSessionsBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:background="@drawable/btn_ghost"
+                android:paddingHorizontal="12dp"
+                android:text="История"
+                android:textAllCaps="false"
+                android:textColor="?attr/nxTextMain"
+                android:textSize="13sp"
+                app:backgroundTint="@null" />
+
+            <ImageButton
+                android:id="@+id/chatNewBtn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_gear"
+                android:contentDescription="Новый диалог"
+                android:src="@drawable/ic_plus"
+                app:tint="?attr/nxTextMain" />
+
+            <ImageButton
+                android:id="@+id/chatSettingsBtn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_gear"
+                android:contentDescription="Настройки"
+                android:src="@drawable/ic_gear"
+                app:tint="?attr/nxTextMain" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/chatScroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingHorizontal="12dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/chatList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="6dp"
+                android:paddingBottom="12dp" />
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/nxSheetBg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <EditText
+                android:id="@+id/chatInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/glass_field"
+                android:hint="Написать Нэксусу…"
+                android:imeOptions="actionSend"
+                android:inputType="textCapSentences|textAutoCorrect"
+                android:maxLines="4"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:textColor="?attr/nxTextMain"
+                android:textColorHint="?attr/nxTextDim" />
+
+            <ImageButton
+                android:id="@+id/chatMicBtn"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_gear"
+                android:contentDescription="Голос"
+                android:src="@drawable/ic_mic"
+                app:tint="?attr/nxTextMain" />
+
+            <ImageButton
+                android:id="@+id/chatSendBtn"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/btn_mic"
+                android:contentDescription="Отправить"
+                android:src="@drawable/ic_send"
+                app:tint="?attr/nxOnPrimary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- затемнение под шторкой -->
+    <View
+        android:id="@+id/chatSheetScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/nxScrim"
+        android:visibility="gone" />
+
+    <!-- шторка: голос, новый диалог, настройки, прослушка -->
+    <LinearLayout
+        android:id="@+id/chatSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/sheet_top"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="34dp"
+        android:clipToPadding="false"
+        android:fitsSystemWindows="true"
+        android:visibility="invisible">
+
+        <View
+            android:layout_width="44dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/sheet_handle" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Нэксус"
+            android:textColor="?attr/nxTextMain"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/sheetWakeState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Прослушка выключена"
+            android:textColor="?attr/nxTextDim"
+            android:textSize="12.5sp" />
+
+        <Button
+            android:id="@+id/sheetTalkBtn"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/btn_mic"
+            android:drawableStart="@drawable/ic_mic"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:paddingHorizontal="18dp"
+            android:text="Поговорить голосом"
+            android:textAllCaps="false"
+            android:textColor="?attr/nxOnPrimary"
+            android:textSize="15.5sp"
+            android:textStyle="bold"
+            app:backgroundTint="@null" />
+
+        <Button
+            android:id="@+id/sheetSettingsBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_ghost"
+            android:text="Настройки"
+            android:textAllCaps="false"
+            android:textColor="?attr/nxTextMain"
+            android:textSize="14sp"
+            app:backgroundTint="@null" />
+
+        <LinearLayout
+            android:id="@+id/sheetWakeRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/glass_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Слушать «Нэксус»"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/sheetWakeHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="слово работает, даже когда приложение свёрнуто"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="11.5sp" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sheetWakeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

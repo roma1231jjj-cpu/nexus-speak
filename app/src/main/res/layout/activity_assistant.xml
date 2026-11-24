@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/assistant_sheet"
+        android:orientation="vertical"
+        android:paddingHorizontal="18dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.local.aivoice.GlobeView
+                android:id="@+id/globe"
+                android:layout_width="52dp"
+                android:layout_height="52dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Запуск…"
+                    android:textColor="?attr/nxTextMain"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textColor="?attr/nxTextDim"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/settingsBtn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_gear"
+                android:contentDescription="Настройки"
+                android:src="@drawable/ic_gear"
+                app:tint="?attr/nxTextMain" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/transcriptBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="4dp" />
+        </ScrollView>
+
+        <Button
+            app:backgroundTint="@null"
+            android:id="@+id/micBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_mic"
+            android:text="Пауза"
+            android:textAllCaps="false"
+            android:textColor="?attr/nxOnPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                app:backgroundTint="@null"
+                android:id="@+id/newDialogBtn"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_ghost"
+                android:text="Заново"
+                android:textAllCaps="false"
+                android:textColor="?attr/nxTextMain"
+                android:textSize="14sp" />
+
+            <Button
+                app:backgroundTint="@null"
+                android:id="@+id/chatBtn"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_ghost"
+                android:gravity="center"
+                android:text="Чат"
+                android:textAllCaps="false"
+                android:textColor="?attr/nxTextMain"
+                android:textSize="14sp" />
+
+            <Button
+                app:backgroundTint="@null"
+                android:id="@+id/stopBtn"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_ghost"
+                android:text="Закрыть"
+                android:textAllCaps="false"
+                android:textColor="?attr/nxTextMain"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

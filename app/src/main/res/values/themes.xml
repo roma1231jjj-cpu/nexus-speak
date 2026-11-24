@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Nexus.Base.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">?attr/nxBg</item>
+        <item name="android:statusBarColor">?attr/nxBg</item>
+        <item name="android:navigationBarColor">?attr/nxBg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="colorPrimary">?attr/nxPrimary</item>
+        <item name="colorOnPrimary">?attr/nxOnPrimary</item>
+        <item name="colorPrimaryContainer">?attr/nxSurface</item>
+        <item name="colorOnPrimaryContainer">?attr/nxTextMain</item>
+        <item name="colorSecondary">?attr/nxPrimary</item>
+        <item name="colorOnSecondary">?attr/nxOnPrimary</item>
+        <item name="colorSurface">?attr/nxSurface</item>
+        <item name="colorOnSurface">?attr/nxTextMain</item>
+        <item name="colorSurfaceVariant">?attr/nxSurface</item>
+        <item name="colorOnSurfaceVariant">?attr/nxTextDim</item>
+        <item name="android:colorBackground">?attr/nxBg</item>
+        <item name="android:textColor">?attr/nxTextMain</item>
+        <item name="android:textColorHint">?attr/nxTextDim</item>
+        <item name="colorAccent">?attr/nxPrimary</item>
+        <item name="colorControlActivated">?attr/nxPrimary</item>
+        <item name="android:colorControlActivated">?attr/nxPrimary</item>
+        <item name="colorControlHighlight">?attr/nxGhostFill</item>
+    </style>
+
+    <style name="Nexus.Base.Light" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowBackground">?attr/nxBg</item>
+        <item name="android:statusBarColor">?attr/nxBg</item>
+        <item name="android:navigationBarColor">?attr/nxBg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="colorPrimary">?attr/nxPrimary</item>
+        <item name="colorOnPrimary">?attr/nxOnPrimary</item>
+        <item name="colorPrimaryContainer">?attr/nxSurface</item>
+        <item name="colorOnPrimaryContainer">?attr/nxTextMain</item>
+        <item name="colorSecondary">?attr/nxPrimary</item>
+        <item name="colorOnSecondary">?attr/nxOnPrimary</item>
+        <item name="colorSurface">?attr/nxSurface</item>
+        <item name="colorOnSurface">?attr/nxTextMain</item>
+        <item name="colorSurfaceVariant">?attr/nxSurface</item>
+        <item name="colorOnSurfaceVariant">?attr/nxTextDim</item>
+        <item name="android:colorBackground">?attr/nxBg</item>
+        <item name="android:textColor">?attr/nxTextMain</item>
+        <item name="android:textColorHint">?attr/nxTextDim</item>
+        <item name="colorAccent">?attr/nxPrimary</item>
+        <item name="colorControlActivated">?attr/nxPrimary</item>
+        <item name="android:colorControlActivated">?attr/nxPrimary</item>
+        <item name="colorControlHighlight">?attr/nxGhostFill</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Midnight" parent="Nexus.Base.Dark">
+        <item name="nxBg">@color/nx_mid_bg</item>
+        <item name="nxSurface">@color/nx_mid_surface</item>
+        <item name="nxSurfaceAlpha">@color/nx_mid_surface_alpha</item>
+        <item name="nxPrimary">@color/nx_mid_primary</item>
+        <item name="nxOnPrimary">@color/nx_mid_on_primary</item>
+        <item name="nxTextMain">@color/nx_mid_text</item>
+        <item name="nxTextDim">@color/nx_mid_text_dim</item>
+        <item name="nxGhostFill">@color/nx_mid_ghost</item>
+        <item name="nxCardFill">@color/nx_mid_card</item>
+        <item name="nxCardFillEnd">@color/nx_mid_card_end</item>
+        <item name="nxGlassFill">@color/nx_mid_glass</item>
+        <item name="nxGlassStroke">@color/nx_mid_stroke</item>
+        <item name="nxBlob1">@color/nx_mid_blob1</item>
+        <item name="nxBlob2">@color/nx_mid_blob2</item>
+        <item name="nxBlob3">@color/nx_mid_blob3</item>
+        <item name="nxSheetBg">@color/nx_mid_sheet</item>
+        <item name="nxOk">@color/nx_mid_ok</item>
+        <item name="nxWarn">@color/nx_mid_warn</item>
+        <item name="nxDanger">@color/nx_mid_danger</item>
+        <item name="nxRipple">@color/nx_mid_ripple</item>
+        <item name="nxScrim">@color/nx_mid_scrim</item>
+        <item name="nxHandle">@color/nx_mid_handle</item>
+        <item name="nxHighlight">@color/nx_mid_highlight</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Frost" parent="Nexus.Base.Light">
+        <item name="nxBg">@color/nx_frost_bg</item>
+        <item name="nxSurface">@color/nx_frost_surface</item>
+        <item name="nxSurfaceAlpha">@color/nx_frost_surface_alpha</item>
+        <item name="nxPrimary">@color/nx_frost_primary</item>
+        <item name="nxOnPrimary">@color/nx_frost_on_primary</item>
+        <item name="nxTextMain">@color/nx_frost_text</item>
+        <item name="nxTextDim">@color/nx_frost_text_dim</item>
+        <item name="nxGhostFill">@color/nx_frost_ghost</item>
+        <item name="nxCardFill">@color/nx_frost_card</item>
+        <item name="nxCardFillEnd">@color/nx_frost_card_end</item>
+        <item name="nxGlassFill">@color/nx_frost_glass</item>
+        <item name="nxGlassStroke">@color/nx_frost_stroke</item>
+        <item name="nxBlob1">@color/nx_frost_blob1</item>
+        <item name="nxBlob2">@color/nx_frost_blob2</item>
+        <item name="nxBlob3">@color/nx_frost_blob3</item>
+        <item name="nxSheetBg">@color/nx_frost_sheet</item>
+        <item name="nxOk">@color/nx_frost_ok</item>
+        <item name="nxWarn">@color/nx_frost_warn</item>
+        <item name="nxDanger">@color/nx_frost_danger</item>
+        <item name="nxRipple">@color/nx_frost_ripple</item>
+        <item name="nxScrim">@color/nx_frost_scrim</item>
+        <item name="nxHandle">@color/nx_frost_handle</item>
+        <item name="nxHighlight">@color/nx_frost_highlight</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Graphite" parent="Nexus.Base.Dark">
+        <item name="nxBg">@color/nx_graph_bg</item>
+        <item name="nxSurface">@color/nx_graph_surface</item>
+        <item name="nxSurfaceAlpha">@color/nx_graph_surface_alpha</item>
+        <item name="nxPrimary">@color/nx_graph_primary</item>
+        <item name="nxOnPrimary">@color/nx_graph_on_primary</item>
+        <item name="nxTextMain">@color/nx_graph_text</item>
+        <item name="nxTextDim">@color/nx_graph_text_dim</item>
+        <item name="nxGhostFill">@color/nx_graph_ghost</item>
+        <item name="nxCardFill">@color/nx_graph_card</item>
+        <item name="nxCardFillEnd">@color/nx_graph_card_end</item>
+        <item name="nxGlassFill">@color/nx_graph_glass</item>
+        <item name="nxGlassStroke">@color/nx_graph_stroke</item>
+        <item name="nxBlob1">@color/nx_graph_blob1</item>
+        <item name="nxBlob2">@color/nx_graph_blob2</item>
+        <item name="nxBlob3">@color/nx_graph_blob3</item>
+        <item name="nxSheetBg">@color/nx_graph_sheet</item>
+        <item name="nxOk">@color/nx_graph_ok</item>
+        <item name="nxWarn">@color/nx_graph_warn</item>
+        <item name="nxDanger">@color/nx_graph_danger</item>
+        <item name="nxRipple">@color/nx_graph_ripple</item>
+        <item name="nxScrim">@color/nx_graph_scrim</item>
+        <item name="nxHandle">@color/nx_graph_handle</item>
+        <item name="nxHighlight">@color/nx_graph_highlight</item>
+    </style>
+
+    <style name="Theme.AIAssistant" parent="Theme.AIAssistant.Midnight" />
+
+    <style name="Theme.AIAssistant.Assistant">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.42</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Midnight.Assistant" parent="Theme.AIAssistant.Midnight">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.42</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Frost.Assistant" parent="Theme.AIAssistant.Frost">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.42</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.AIAssistant.Graphite.Assistant" parent="Theme.AIAssistant.Graphite">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.42</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="GlassCard">
+        <item name="android:tag">glassCard</item>
+        <item name="android:background">@drawable/glass_card</item>
+        <item name="android:padding">20dp</item>
+        <item name="android:layout_marginTop">14dp</item>
+    </style>
+    <style name="FieldLabel">
+        <item name="android:textColor">?attr/nxTextMain</item>
+        <item name="android:textSize">14.5sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:letterSpacing">0.005</item>
+    </style>
+    <style name="SectionTitle">
+        <item name="android:textColor">?attr/nxTextDim</item>
+        <item name="android:textSize">11.5sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+    <style name="Selector">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/glass_field</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:paddingVertical">14dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textColor">?attr/nxTextMain</item>
+        <item name="android:textSize">14.5sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:drawableEnd">@drawable/ic_chevron</item>
+        <item name="android:drawableTint">?attr/nxTextDim</item>
+        <item name="android:drawablePadding">8dp</item>
+    </style>
+    <style name="Theme.AIAssistant.Amoled" parent="Theme.AIAssistant.Midnight">
+        <item name="android:windowBackground">#FF000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
+        <item name="android:navigationBarColor">#FF000000</item>
+        <item name="colorSurface">#FF0B0B0F</item>
+        <item name="nxBg">#FF000000</item>
+        <item name="nxSurface">#FF0B0B0F</item>
+        <item name="nxSheetBg">#FF08080C</item>
+        <item name="nxCardFill">#FF0B0B0F</item>
+        <item name="nxCardFillEnd">#FF08080C</item>
+    </style>
+</resources>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#F3F6FC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surfaceAlpha">#B3FFFFFF</color>
+    <color name="primary">#2E6BFF</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="textMain">#101828</color>
+    <color name="textDim">#5A6B85</color>
+    <color name="ghostFill">#F7FFFFFF</color>
+    <color name="cardFillEnd">#E6FFFFFF</color>
+    <color name="cardFill">#E6FFFFFF</color>
+    <color name="glassFill">#99FFFFFF</color>
+    <color name="glassStroke">#2E2E6BFF</color>
+    <color name="blob1">#2E2E6BFF</color>
+    <color name="blob2">#267C4CFF</color>
+    <color name="blob3">#1FFF5EC8</color>
+    <color name="iconBg">#140920</color>
+    <color name="bg_sheet">#FFF7F9FE</color>
+    <color name="sheetBg">#FFF7F9FE</color>
+
+    <color name="nx_mid_bg">#FF0A0812</color>
+    <color name="nx_mid_surface">#FF100D19</color>
+    <color name="nx_mid_surface_alpha">#59FFFFFF</color>
+    <color name="nx_mid_primary">#FF8B5CF6</color>
+    <color name="nx_mid_on_primary">#FFFFFFFF</color>
+    <color name="nx_mid_text">#FFF5F2FF</color>
+    <color name="nx_mid_text_dim">#FFA89AC6</color>
+    <color name="nx_mid_ghost">#14FFFFFF</color>
+    <color name="nx_mid_card">#CC161022</color>
+    <color name="nx_mid_card_end">#C00A0812</color>
+    <color name="nx_mid_glass">#1AFFFFFF</color>
+    <color name="nx_mid_stroke">#2E9A7BE0</color>
+    <color name="nx_mid_blob1">#3D8B5CF6</color>
+    <color name="nx_mid_blob2">#33A78BFA</color>
+    <color name="nx_mid_blob3">#2E6D28D9</color>
+    <color name="nx_mid_sheet">#FF0F0C18</color>
+
+    <color name="nx_frost_bg">#FFF4F7FF</color>
+    <color name="nx_frost_surface">#FFFFFFFF</color>
+    <color name="nx_frost_surface_alpha">#B3FFFFFF</color>
+    <color name="nx_frost_primary">#FF2563EB</color>
+    <color name="nx_frost_on_primary">#FFFFFFFF</color>
+    <color name="nx_frost_text">#FF0F172A</color>
+    <color name="nx_frost_text_dim">#FF54658A</color>
+    <color name="nx_frost_ghost">#F7FFFFFF</color>
+    <color name="nx_frost_card">#F2FFFFFF</color>
+    <color name="nx_frost_card_end">#E6FFFFFF</color>
+    <color name="nx_frost_glass">#E6FFFFFF</color>
+    <color name="nx_frost_stroke">#292563EB</color>
+    <color name="nx_frost_blob1">#1F2563EB</color>
+    <color name="nx_frost_blob2">#1A60A5FA</color>
+    <color name="nx_frost_blob3">#14818CF8</color>
+    <color name="nx_frost_sheet">#FFFFFFFF</color>
+
+    <color name="nx_graph_bg">#FF0B0F10</color>
+    <color name="nx_graph_surface">#FF141A1B</color>
+    <color name="nx_graph_surface_alpha">#4DFFFFFF</color>
+    <color name="nx_graph_primary">#FF46D39A</color>
+    <color name="nx_graph_on_primary">#FF06231A</color>
+    <color name="nx_graph_text">#FFEAF5F0</color>
+    <color name="nx_graph_text_dim">#FF8FA6A0</color>
+    <color name="nx_graph_ghost">#12FFFFFF</color>
+    <color name="nx_graph_card">#CC16201F</color>
+    <color name="nx_graph_card_end">#C00D1413</color>
+    <color name="nx_graph_glass">#17FFFFFF</color>
+    <color name="nx_graph_stroke">#2646D39A</color>
+    <color name="nx_graph_blob1">#3346D39A</color>
+    <color name="nx_graph_blob2">#2E2DD4BF</color>
+    <color name="nx_graph_blob3">#2419857A</color>
+    <color name="nx_graph_sheet">#FF0F1516</color>
+
+    <color name="nx_mid_ok">#FF5BE59A</color>
+    <color name="nx_mid_warn">#FFF0B44C</color>
+    <color name="nx_mid_danger">#FFFF7A8A</color>
+    <color name="nx_mid_ripple">#33FFFFFF</color>
+    <color name="nx_mid_scrim">#B3000000</color>
+    <color name="nx_mid_handle">#59FFFFFF</color>
+    <color name="nx_mid_highlight">#1FFFFFFF</color>
+
+    <color name="nx_frost_ok">#FF12805A</color>
+    <color name="nx_frost_warn">#FF9A5B00</color>
+    <color name="nx_frost_danger">#FFC42A3C</color>
+    <color name="nx_frost_ripple">#292563EB</color>
+    <color name="nx_frost_scrim">#66101828</color>
+    <color name="nx_frost_handle">#3354658A</color>
+    <color name="nx_frost_highlight">#0A000000</color>
+
+    <color name="nx_graph_ok">#FF46D39A</color>
+    <color name="nx_graph_warn">#FFE9B45B</color>
+    <color name="nx_graph_danger">#FFFF8A8A</color>
+    <color name="nx_graph_ripple">#26FFFFFF</color>
+    <color name="nx_graph_scrim">#B3000000</color>
+    <color name="nx_graph_handle">#4DFFFFFF</color>
+    <color name="nx_graph_highlight">#17FFFFFF</color>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#140920</color>
+    <color name="surface">#241436</color>
+    <color name="surfaceAlpha">#59FFFFFF</color>
+    <color name="primary">#B57CFF</color>
+    <color name="onPrimary">#1A0B29</color>
+    <color name="textMain">#F3ECFF</color>
+    <color name="textDim">#B9A8D6</color>
+    <color name="ghostFill">#12FFFFFF</color>
+    <color name="cardFill">#D8160C24</color>
+    <color name="cardFillEnd">#C00E0719</color>
+    <color name="glassFill">#2EFFFFFF</color>
+    <color name="glassStroke">#3DFFFFFF</color>
+    <color name="blob1">#3DA24CFF</color>
+    <color name="blob2">#33FF5EC8</color>
+    <color name="blob3">#2E5B8CFF</color>
+    <color name="iconBg">#140920</color>
+    <color name="bg_sheet">#FF120A1E</color>
+    <color name="sheetBg">#FF120A1E</color>
+</resources>

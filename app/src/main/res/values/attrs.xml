@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="nxBg" format="color" />
+    <attr name="nxSurface" format="color" />
+    <attr name="nxSurfaceAlpha" format="color" />
+    <attr name="nxPrimary" format="color" />
+    <attr name="nxOnPrimary" format="color" />
+    <attr name="nxTextMain" format="color" />
+    <attr name="nxTextDim" format="color" />
+    <attr name="nxGhostFill" format="color" />
+    <attr name="nxCardFill" format="color" />
+    <attr name="nxCardFillEnd" format="color" />
+    <attr name="nxGlassFill" format="color" />
+    <attr name="nxGlassStroke" format="color" />
+    <attr name="nxBlob1" format="color" />
+    <attr name="nxBlob2" format="color" />
+    <attr name="nxBlob3" format="color" />
+    <attr name="nxSheetBg" format="color" />
+    <attr name="nxOk" format="color" />
+    <attr name="nxWarn" format="color" />
+    <attr name="nxDanger" format="color" />
+    <attr name="nxRipple" format="color" />
+    <attr name="nxScrim" format="color" />
+    <attr name="nxHandle" format="color" />
+    <attr name="nxHighlight" format="color" />
+</resources>
