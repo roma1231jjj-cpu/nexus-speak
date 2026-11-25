@@ -60,15 +60,23 @@ public class CloudTts {
         edgeBlockedUntil = System.currentTimeMillis() + 24 * 60 * 60_000L;
     }
 
+    /**
+     * Блокируем только на настоящий отказ сервера (401/403/404).
+     * Таймаут и офлайн — не повод запрещать движок на сутки.
+     */
+    private static void blockEdgeIfRefused(Throwable t) {
+        if (TtsProbe.edgeRefusal(t)) blockEdge();
+    }
+
     /** один фоновый замер при старте: к первому ответу уже знаем, живой ли Edge */
     public static void probeAsync(final Context c) {
         if (!EDGE.equals(provider(c)) || edgeBlocked()) return;
         new Thread(() -> {
             try {
-                byte[] a = EdgeTts.synth("проверка", "ru-RU-SvetlanaNeural", 1f);
-                if (a == null || a.length < 500) blockEdge();
+                EdgeTts.synth("проверка", EdgeTts.defaultVoice("ru-RU"), 1f);
             } catch (Throwable t) {
-                blockEdge();
+                // пустой/короткий ответ и обрыв сети не блокируют: это не отказ
+                blockEdgeIfRefused(t);
             }
         }, "edge-probe").start();
     }
@@ -113,9 +121,10 @@ public class CloudTts {
 
     public static String provider(Context c) {
         android.content.SharedPreferences p = SettingsStore.p(c);
-        // настройку ещё ни разу не трогали — сразу живой нейроголос,
-        // а не робот из системного синтезатора
-        if (!p.contains("ttsCloud")) return EDGE;
+        // По умолчанию — бесплатный голос Google-переводчика: Edge из России
+        // стабильно отвечает 403, и первый же ответ молчал бы. Настройку не
+        // трогали — берём самый предсказуемый живой голос.
+        if (!p.contains("ttsCloud")) return FREE;
         return p.getString("ttsCloud", "");
     }
 
@@ -240,23 +249,27 @@ public class CloudTts {
         if (EDGE.equals(provider)) {
             // Edge отдаёт самый живой голос, но сервер иногда отвечает 403 —
             // тогда молча берём бесплатный Google-голос, а не робота из системы
+            String tag = TtsSpeaker.languageTag(text);
+            boolean voiceChosen = !SettingsStore.p(ctx)
+                    .getString("ttsCloudVoice", "").trim().isEmpty();
             if (!edgeBlocked()) {
+                String useVoice = voiceChosen ? voice : EdgeTts.defaultVoice(tag);
                 try {
-                    byte[] audio = EdgeTts.synth(text, voice, speed);
+                    byte[] audio = EdgeTts.synth(text, useVoice, speed);
                     if (audio != null && audio.length >= 500) return audio;
                 } catch (Throwable t) {
                     android.util.Log.d("NexusTts", "edge fail: " + t);
+                    blockEdgeIfRefused(t);
                 }
-                blockEdge();
             }
             // v1.9.3: если человек выбрал конкретный голос, подменять его
             // «женщиной из переводчика» нельзя — иначе выбор голоса виден только в настройках.
             // Пусть тогда скажет выбранный голос движка телефона.
-            if (SettingsStore.p(ctx).getString("ttsCloudVoice", "").trim().isEmpty()) {
+            if (!voiceChosen) {
                 byte[] google2 = googleFree(text);
                 if (google2 != null && google2.length >= 500) return google2;
             }
-            throw new Exception(L.s("Нейроголос Edge недоступен"));
+            throw new Exception(L.s("Edge временно недоступен — выбери другой движок озвучки"));
         }
 
         if (FREE.equals(provider)) {
@@ -269,6 +282,7 @@ public class CloudTts {
             String id = URLEncoder.encode(voice, "UTF-8");
             String url = "https://api.elevenlabs.io/v1/text-to-speech/" + id
                     + "?output_format=mp3_44100_128";
+            checkUrl(url);
             org.json.JSONObject body = new org.json.JSONObject();
             body.put("text", text);
             body.put("model_id", "eleven_multilingual_v2");
@@ -288,16 +302,18 @@ public class CloudTts {
 
         if (YANDEX.equals(provider)) {
             String folder = SettingsStore.p(ctx).getString("ttsCloudFolder", "").trim();
+            String yUrl = "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize";
+            checkUrl(yUrl);
             FormBody.Builder form = new FormBody.Builder()
                     .add("text", text.length() > 4000 ? text.substring(0, 4000) : text)
-                    .add("lang", "ru-RU")
+                    .add("lang", yandexLang(text))
                     .add("voice", voice)
                     .add("speed", String.format(java.util.Locale.US, "%.1f", speed))
                     .add("format", "mp3")
                     .add("emotion", "neutral");
             if (!folder.isEmpty()) form.add("folderId", folder);
             Request req = new Request.Builder()
-                    .url("https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize")
+                    .url(yUrl)
                     .addHeader("Authorization", "Api-Key " + key)
                     .post(form.build())
                     .build();
@@ -308,6 +324,7 @@ public class CloudTts {
         String base = SettingsStore.p(ctx).getString("ttsCloudUrl", "").trim();
         if (base.isEmpty()) base = "https://api.openai.com/v1";
         if (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+        checkUrl(base + "/audio/speech");
         String model = SettingsStore.p(ctx).getString("ttsCloudModel", "").trim();
         if (model.isEmpty()) model = "gpt-4o-mini-tts";
         org.json.JSONObject body = new org.json.JSONObject();
@@ -317,7 +334,8 @@ public class CloudTts {
         body.put("response_format", "mp3");
         body.put("speed", speed);
         if (model.startsWith("gpt-4o")) {
-            body.put("instructions", L.isEn()
+            // язык подсказки — язык самого текста, а не интерфейса
+            body.put("instructions", TtsSpeaker.isEnglishText(text)
                     ? "Speak English warmly and naturally, no theatrics, at a calm pace."
                     : "Говори по-русски тепло, живо и естественно, "
                     + "без театральности, в спокойном темпе.");
@@ -330,12 +348,31 @@ public class CloudTts {
         return bytes(req);
     }
 
+    /** перед любым запросом: http:// вне локальной сети — отказ с понятным текстом */
+    private static void checkUrl(String url) throws Exception {
+        String bad = LlmClient.insecureUrl(url);
+        if (bad != null) throw new Exception(bad);
+    }
+
+    /** язык синтеза из текста: у Яндекса поддерживаются ru-RU и en-US */
+    private static String yandexLang(String text) {
+        String tag = TtsSpeaker.languageTag(text);
+        if (tag != null && tag.toLowerCase(java.util.Locale.ROOT).startsWith("en")) return "en-US";
+        return "ru-RU";
+    }
+
     /** Google-переводчик отдаёт mp3 без ключа; режем текст на куски по ~180 символов. */
     private byte[] googleFree(String text) throws Exception {
+        String tag = TtsSpeaker.languageTag(text);
+        String tl = tag == null
+                ? java.util.Locale.getDefault().getLanguage()
+                : tag.substring(0, 2).toLowerCase(java.util.Locale.ROOT);
+        if (tl.isEmpty()) tl = "ru";
         java.io.ByteArrayOutputStream all = new java.io.ByteArrayOutputStream();
         for (String chunk : splitForTts(text, 180)) {
-            String url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ru&q="
-                    + URLEncoder.encode(chunk, "UTF-8");
+            String url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl="
+                    + tl + "&q=" + URLEncoder.encode(chunk, "UTF-8");
+            checkUrl(url);
             Request req = new Request.Builder().url(url)
                     .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13) NexusSpeak")
                     .addHeader("Referer", "https://translate.google.com/")

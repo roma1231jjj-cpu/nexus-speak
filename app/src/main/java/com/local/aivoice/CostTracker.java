@@ -20,10 +20,20 @@ public final class CostTracker {
         }
     }
 
-    /** Adds the cost of the last LLM call. Called on main thread after chat completes. */
-    public static synchronized void addLast(Context c, String model) {
+    /** Adds the cost of the last LLM call, using the model that really answered. */
+    public static synchronized void addLast(Context c) {
+        LlmClient.Usage usage = LlmClient.takeUsage();
+        if (usage == null || usage.prompt < 0) return;
+        add(c, usage.model, usage.prompt, usage.completion);
+    }
+
+    /** Kept for older call sites: the model argument is ignored on purpose. */
+    public static synchronized void addLast(Context c, String ignoredModel) {
+        addLast(c);
+    }
+
+    private static void add(Context c, String model, int promptTokens, int completionTokens) {
         try {
-            if (LlmClient.lastPromptTokens < 0) return;
             String cache = SettingsStore.p(c).getString("catalogCache", null);
             if (cache == null) return;
             JSONObject root = new JSONObject(cache);
@@ -31,15 +41,13 @@ public final class CostTracker {
             if (arr == null) return;
             double pin = arr.optDouble(0, -1), pout = arr.optDouble(1, -1);
             if (pin < 0) return;
-            double cost = pin * LlmClient.lastPromptTokens / 1e6
-                    + pout * LlmClient.lastCompletionTokens / 1e6;
+            double cost = pin * promptTokens / 1e6
+                    + pout * completionTokens / 1e6;
             String day = new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
                     .format(new java.util.Date());
             String key = "spend_" + day;
             double prev = SettingsStore.p(c).getFloat(key, 0f);
             SettingsStore.p(c).edit().putFloat(key, (float) (prev + cost)).apply();
-            LlmClient.lastPromptTokens = -1;
-            LlmClient.lastCompletionTokens = -1;
         } catch (Exception ignored) {
         }
     }

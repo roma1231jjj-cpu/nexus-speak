@@ -43,9 +43,12 @@ public final class DeviceTools {
             }
         });
         try {
-            latch.await(15, TimeUnit.SECONDS);
+            if (!latch.await(15, TimeUnit.SECONDS)) {
+                return "Действие не завершилось за 15 секунд — проверь, что происходит на экране.";
+            }
         } catch (InterruptedException e) {
-            result[0] = "Таймаут действия";
+            Thread.currentThread().interrupt();
+            return "Действие прервано.";
         }
         return result[0];
     }
@@ -130,20 +133,16 @@ public final class DeviceTools {
                 String number = resolveContact(ctx, who);
                 if (number == null && who.matches(".*\\d.*")) number = who.replaceAll("[^+0-9*#]", "");
                 if (number == null) return "Не нашёл контакт «" + who + "» в телефонной книге.";
-                Intent i = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number));
+                // Звонок НИКОГДА не идёт сам: только звонилка с готовым номером.
+                // Раньше здесь был ACTION_CALL, и звонок улетал без «да» пользователя.
+                Intent i = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 try {
                     ctx.startActivity(i);
-                    return "Звоню " + who + " (" + number + ").";
+                    return "Открыл звонилку: " + who + " (" + number
+                            + "). Нажми вызов, чтобы позвонить — сам я не звоню.";
                 } catch (Exception e) {
-                    // no CALL_PHONE permission -> dialer
-                    try {
-                        ctx.startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                        return "Открыл звонилку — подтверди вызов.";
-                    } catch (Exception e2) {
-                        return "Не смог позвонить: " + e2;
-                    }
+                    return "Не смог открыть звонилку: " + e;
                 }
             }
             case "sms": {
@@ -152,39 +151,40 @@ public final class DeviceTools {
                 String number = resolveContact(ctx, to);
                 if (number == null) number = to.replaceAll("[^+0-9]", "");
                 if (number.isEmpty()) return "Не понял, кому отправить сообщение.";
-                try {
-                    if (ctx.checkSelfPermission(Manifest.permission.SEND_SMS)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        android.telephony.SmsManager sm = android.os.Build.VERSION.SDK_INT >= 31
-                                ? ctx.getSystemService(android.telephony.SmsManager.class)
-                                : android.telephony.SmsManager.getDefault();
-                        if (sm != null) {
-                            sm.sendTextMessage(number, null, text, null, null);
-                            return "Сообщение отправлено на " + number + ".";
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
+                if (text.trim().isEmpty()) return "Текст сообщения пустой — скажи, что написать.";
+                // Отправки без подтверждения нет: открываем редактор SMS с готовым
+                // текстом, отправляет человек. Длинный текст остаётся одним черновиком,
+                // редактор сам разобьёт его на части при отправке.
                 Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + number));
                 i.putExtra("sms_body", text);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ctx.startActivity(i);
-                return "Открыл SMS — подтверди отправку.";
+                try {
+                    ctx.startActivity(i);
+                    return "Открыл SMS для " + number + " с готовым текстом — проверь и отправь сам.";
+                } catch (Exception e) {
+                    return "Не смог открыть SMS: " + e;
+                }
             }
             case "open_app": {
-                String name = args != null ? args.optString("name", "").toLowerCase(java.util.Locale.ROOT) : "";
-                if (name.isEmpty()) return "Не указано приложение.";
+                String name = args != null
+                        ? args.optString("name", "").trim().toLowerCase(java.util.Locale.ROOT)
+                        : "";
+                // Пустое имя раньше совпадало с первым приложением в списке
+                // (label.contains("") == true) и открывало что попало.
+                if (name.length() < 2) return "Не указано приложение.";
                 PackageManager pm = ctx.getPackageManager();
                 Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
                 for (android.content.pm.ResolveInfo ri : pm.queryIntentActivities(main, 0)) {
                     String label = ri.loadLabel(pm).toString().toLowerCase(java.util.Locale.ROOT);
-                    if (label.contains(name) || name.contains(label)) {
-                        Intent i = pm.getLaunchIntentForPackage(ri.activityInfo.packageName);
-                        if (i != null) {
-                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            ctx.startActivity(i);
-                            return "Открываю " + ri.loadLabel(pm) + ".";
-                        }
+                    boolean hit = label.equals(name) || label.startsWith(name)
+                            || name.startsWith(label) && label.length() >= 2
+                            || (" " + label + " ").contains(" " + name + " ");
+                    if (!hit) continue;
+                    Intent i = pm.getLaunchIntentForPackage(ri.activityInfo.packageName);
+                    if (i != null) {
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        ctx.startActivity(i);
+                        return "Открываю " + ri.loadLabel(pm) + ".";
                     }
                 }
                 return "Не нашёл приложение «" + name + "».";
@@ -237,11 +237,11 @@ public final class DeviceTools {
                 return "Громкость мультимедиа " + Math.round(v * 100.0 / max) + "%.";
             }
             case "wifi": {
-                boolean on = args == null || args.optBoolean("on", true);
                 try {
                     ctx.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                    return "Открыл панель Wi-Fi — подтверди переключение.";
+                    return "Открыл панель Wi-Fi. Переключить сам не могу — Android не даёт "
+                            + "приложениям менять Wi-Fi без согласия, переключи в панели.";
                 } catch (Exception e) {
                     return "Не смог открыть настройки Wi-Fi.";
                 }
@@ -250,7 +250,7 @@ public final class DeviceTools {
                 try {
                     ctx.startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                    return "Открыл панель Bluetooth — подтверди переключение.";
+                    return "Открыл настройки Bluetooth. Включить сам не могу — переключи там.";
                 } catch (Exception e) {
                     return "Не смог открыть настройки Bluetooth.";
                 }

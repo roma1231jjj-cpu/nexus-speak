@@ -26,7 +26,7 @@
 - Phone control tools: timers, alarms, calls, messages, volume, flashlight, app launch.
 - Bring your own key: no key, no provider and no telemetry inside the build.
 
-**Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. Android 13+ is recommended.
+**Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. It requires Android 13 or newer (`minSdk 33`); on Android 8–12 the APK does not install.
 
 **Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
 
@@ -36,7 +36,7 @@
 
 **Language:** Settings → «Язык / Language» — Русский / English. The choice is saved and applied instantly (`recreate()`), no app restart, no re-login. Voice recognition and TTS stay on the system languages — the switch only changes the UI, so a Russian voice engine keeps speaking Russian.
 
-**Build:** JDK 17, Android SDK, `gradle assembleRelease`. The APK is signed with a debug key for distribution as a side-loaded build.
+**Build:** JDK 17, Android SDK, the Gradle wrapper committed in the repo (Gradle 8.7). A release build needs your own keystore — see [Build from source](#build-from-source). **The APK attached to the releases is signed with a debug key**: it is a side-loaded build, not a Play Store one.
 
 The rest of this README is in Russian — ask in the issues if you need an English guide for a specific screen.
 
@@ -44,7 +44,7 @@ The rest of this README is in Russian — ask in the issues if you need an Engli
 
 1. Скачай **[Nexus.apk](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest)** (или из [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases)).
 2. Разреши установку из неизвестных источников и поставь APK.
-3. Android 13+ (на 8–12 запускается, но без части фишек).
+3. Android 13 и выше — `minSdk 33`. На Android 8–12 APK не установится: система скажет, что версия не поддерживается.
 4. Открой **Настройки → «Выбрать провайдера»** → выбери из списка или введи свой адрес → вставь свой API-ключ.
 5. Модели и цены подтянутся автоматически. Нажми **«Сделать помощником по умолчанию»**.
 
@@ -60,7 +60,45 @@ Polza.ai · OpenRouter · OpenAI · DeepSeek · Groq · Mistral · Together AI �
 
 Достаточно указать адрес — приложение само определит провайдера, попробует `/models` и `/v1/models`, загрузит список моделей, цены за миллион токенов и автоматически подставит модель для ответов и vision-модель.
 
-Обновления приходят сами: приложение проверяет `update.json` в этом репозитории, спрашивает разрешение на скачивание, показывает прогресс и просит подтвердить установку.
+Обновления проверяются по `update.json` в этом репозитории, но **сами не качаются**: проверка версии только сообщает о новой сборке, а файл скачивается после явного «Скачать». Целостность файла и подпись проверяются — подробнее в разделе «Обновления и проверка файла».
+
+## 🔄 Обновления и проверка файла
+
+`update.json` в корне репозитория — единственный манифест обновления:
+
+```json
+{
+  "versionCode": 59,
+  "versionName": "1.10.6",
+  "apkUrl": "https://…/Nexus.apk",
+  "sha256": "64 шестнадцатеричных символа — SHA-256 от APK",
+  "notes": "что нового"
+}
+```
+
+Что делает приложение:
+
+- проверка версии (`versionCode`) **ничего не скачивает** — и тихая проверка при открытии настроек, и кнопка «Проверить обновления» только показывают результат;
+- APK (сейчас около 11 МБ) скачивается только после явного «Скачать»;
+- SHA-256 считается по ходу записи файла и сверяется с `sha256` из манифеста. Не совпало — файл удаляется, обновление отменяется с текстом ошибки. Поля `sha256` нет или оно битое — обновление вообще не предлагается («обновление без контрольной суммы не устанавливаю»);
+- перед установкой SHA-256 сертификата APK сверяется с подписью установленного приложения (`PackageManager.getPackageInfo(…, GET_SIGNING_CERTIFICATES)`). Чужой, переподписанный или битый APK не устанавливается;
+- установка идёт через сессию `PackageInstaller`, финальное подтверждение — системное.
+
+Проверить вручную:
+
+```bash
+sha256sum Nexus.apk                 # сверить с полем "sha256" в update.json
+apksigner verify --print-certs Nexus.apk   # каким ключом подписан файл
+```
+
+## 💾 Резервная копия настроек
+
+Приложение пишет две копии настроек:
+
+- `files/settings-backup.json` — полная, в приватной папке приложения. Переживает обновление, но исчезает вместе с приложением, поэтому не единственный путь восстановления;
+- `Загрузки/Nexus Speak/nexus-settings-backup.json` — обезличенная копия: **без API-ключей, токенов и сессий и без личных данных** (`userInfo`, приветствие автоответчика, история диалогов туда не попадают). Такой файл не стыдно переслать или показать.
+
+Восстановление — из выбранного файла: системный диалог SAF (`ACTION_OPEN_DOCUMENT`, `application/zip` или любой файл) отдаёт JSON или ZIP с копией внутри, читается он через `ContentResolver`, поэтому доступ ко всем «Загрузкам» приложению не нужен. Ранее выбранный файл запоминается, и после переустановки приложение пробует восстановиться из него само.
 
 ## Как позвать
 
@@ -90,6 +128,7 @@ Polza.ai · OpenRouter · OpenAI · DeepSeek · Groq · Mistral · Together AI �
 ### Управление телефоном
 - Открытие приложений, ссылок, поиск в интернете.
 - Фонарик, громкость, будильники и таймеры, звонки и SMS, контакты.
+- **Ни звонок, ни SMS не отправляются молча**: Нэксус открывает системную звонилку (`ACTION_DIAL`) или приложение сообщений (`smsto:`) с подставленным номером и готовым текстом — подтверждаешь и отправляешь ты сам.
 - Чтение экрана (скриншот → vision-модель): «что на экране?».
 - Погода, курсы, новости — через встроенный веб-инструмент.
 
@@ -137,13 +176,44 @@ Android показывает список приложений, только к�
 
 ## Сборка
 
+Wrapper лежит в репозитории (`gradle/wrapper/gradle-wrapper.jar`, Gradle 8.7) — отдельно ставить Gradle не нужно, хватит JDK 17+ и Android SDK. Скриптов `gradlew`/`gradlew.bat` в репозитории нет, поэтому сборка запускается так:
+
 ```bash
-cd assistant
-gradle wrapper --gradle-version 8.7   # один раз
-./gradlew assembleRelease
+# debug-сборка, подпись debug-ключом
+java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain assembleDebug
+
+# release, нужен свой ключ подписи (ниже)
+java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain assembleRelease
+
+# или, если Gradle 8.7+ уже установлен
+gradle assembleRelease
 ```
 
-Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
+Java-only, без Compose. `minSdk 33`, `targetSdk 34`. Флаг `-Plowapi` опускает `minSdk` до 28 — только для старого эмулятора и скриншотов, в релиз такое не идёт.
+
+Структура репозитория: `app/` — приложение (код в `app/src/main/java/com/local/aivoice`), `docs/` — скриншоты, `update.json` — манифест автообновления.
+
+### Подписанный релиз
+
+Release подписывается только своим ключом: debug-подпись в релизе запрещена, без ключа сборка падает с сообщением «Нет ключа подписи».
+
+```bash
+keytool -genkeypair -v -keystore nexus-release.jks -alias nexus \
+  -keyalg RSA -keysize 4096 -validity 10000
+```
+
+`keystore.properties` в корне проекта (файл в `.gitignore`, в git не попадает):
+
+```properties
+storeFile=nexus-release.jks
+storePassword=…
+keyAlias=nexus
+keyPassword=…
+```
+
+Вместо файла можно задать переменные окружения `NEXUS_KEYSTORE`, `NEXUS_KEYSTORE_PASSWORD`, `NEXUS_KEY_ALIAS`, `NEXUS_KEY_PASSWORD`. Готовый APK — в `app/build/outputs/apk/release/`.
+
+**APK в релизах этого репозитория собран debug-ключом** — это side-load сборка, не для Google Play. Обновление по `update.json` ставится только поверх приложения с той же подписью, так что для своего форка собери релиз своим ключом.
 
 ## Ограничения (честно)
 
@@ -304,10 +374,4 @@ Java-only, без Compose. `minSdk 33`, `targetSdk 34`.
 
 ## Сборка из исходников
 
-Проект целиком лежит в этом репозитории: `app/` — Android-приложение (Java, Gradle 8.10), `docs/` — скриншоты, `update.json` — манифест автообновления.
-
-```bash
-gradle assembleRelease        # APK в app/build/outputs/apk/release/
-```
-
-Нужен Android SDK и JDK 17. Готовые сборки — в разделе Releases.
+Проект целиком лежит в этом репозитории: `app/` — Android-приложение (Java 17, Gradle 8.7 через wrapper), `docs/` — скриншоты, `update.json` — манифест автообновления. Команды сборки и настройка подписи — в разделе [«Сборка»](#сборка). Готовые сборки — в разделе Releases.

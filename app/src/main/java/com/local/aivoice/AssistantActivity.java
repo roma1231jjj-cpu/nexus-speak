@@ -3,6 +3,7 @@ package com.local.aivoice;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -71,6 +72,8 @@ public class AssistantActivity extends AppCompatActivity {
     private int thinkingPhase = 0;
     /** ждём колбэк окончания озвучки ответа */
     private boolean answerSpeaking = false;
+    /** когда ответ начал звучать: защита от «позднего» onTtsDone прошлого ответа */
+    private long answerStartedAt = 0;
     private Runnable ttsGuard;
 
     @SuppressLint("MissingPermission")
@@ -131,6 +134,11 @@ public class AssistantActivity extends AppCompatActivity {
         }
         fitSheet();
 
+        if (!trustedLaunch(getIntent())) {
+            // чужое приложение открыло ассистента без токена — не выполняем его текст
+            finish();
+            return;
+        }
         String coldPre = getIntent() != null
                 ? getIntent().getStringExtra(WakeService.EXTRA_TEXT) : null;
         if (coldPre != null && !coldPre.trim().isEmpty()
@@ -160,11 +168,36 @@ public class AssistantActivity extends AppCompatActivity {
         }
     }
 
+    /** Токен внутреннего запуска: без него текст из EXTRA_TEXT не принимается. */
+    public static final String EXTRA_TOKEN = "nx_internal";
+
+    /** Единственный правильный способ открыть ассистента изнутри приложения. */
+    public static Intent internalIntent(Context c) {
+        return new Intent(c, AssistantActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                .putExtra(EXTRA_TOKEN, SettingsStore.internalToken(c));
+    }
+
+    /**
+     * Экран экспортирован для ASSIST/VOICE_COMMAND, поэтому запустить его может
+     * любое приложение. Текст запроса и сам запуск принимаем только от системы
+     * (ASSIST, VOICE_COMMAND) или от себя — по секретному токену.
+     */
+    private boolean trustedLaunch(Intent intent) {
+        if (intent == null) return true;
+        String token = intent.getStringExtra(EXTRA_TOKEN);
+        if (token != null && token.equals(SettingsStore.internalToken(this))) return true;
+        String action = intent.getAction();
+        return Intent.ACTION_ASSIST.equals(action)
+                || "android.intent.action.VOICE_COMMAND".equals(action);
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        String pre = intent != null ? intent.getStringExtra(WakeService.EXTRA_TEXT) : null;
+        String pre = trustedLaunch(intent) && intent != null
+                ? intent.getStringExtra(WakeService.EXTRA_TEXT) : null;
         if (pre != null && !pre.trim().isEmpty()) {
             stopRecognizer();
             paused = false;
@@ -728,8 +761,16 @@ public class AssistantActivity extends AppCompatActivity {
         text = text.replaceFirst(wake, "");
         if (text.trim().isEmpty()) { listenOnce(); return; }
 
-        if (low.contains("заново") || low.contains("новый диалог") || low.contains("очисти историю")
-                || low.contains("start over") || low.contains("new chat") || low.contains("clear history")) {
+        // «объясни заново» — это просьба повторить ответ, а не стереть диалог.
+        // Поэтому команда сравнивается целиком, а не по подстроке.
+        String cmd = low.replaceAll("[\\p{Punct}\\s]+", " ").trim();
+        boolean clearChat = cmd.equals("заново") || cmd.equals("начни заново")
+                || cmd.equals("начать заново") || cmd.equals("новый диалог")
+                || cmd.equals("новый чат") || cmd.equals("очисти историю")
+                || cmd.equals("очистить историю") || cmd.equals("start over")
+                || cmd.equals("new chat") || cmd.equals("new dialog")
+                || cmd.equals("clear history");
+        if (clearChat) {
             appendTranscript(L.s("Вы: "), text);
             ConversationStore.clear(this);
             appendTranscript(L.s("Нексус: "), L.s("Начинаю с чистого листа."));
@@ -791,6 +832,7 @@ public class AssistantActivity extends AppCompatActivity {
                             stopThinkingDots();
                             setStatus(L.s("Говорю…"), true);
                             answerSpeaking = true;
+                            answerStartedAt = android.os.SystemClock.uptimeMillis();
                             armTtsGuard(4000 + piece.length() * 90);
                             say(piece);
                             spokeAnything[0] = true;
@@ -821,6 +863,7 @@ public class AssistantActivity extends AppCompatActivity {
                     setStatus(L.s("Не получилось"), true);
                     setHint(L.s("Проверь API-ключ и интернет в настройках"));
                     answerSpeaking = true;
+                    answerStartedAt = android.os.SystemClock.uptimeMillis();
                     armTtsGuard(6000);
                     say(L.s("Не получилось получить ответ. Проверь настройки."));
                     updateMicButton();
@@ -913,6 +956,14 @@ public class AssistantActivity extends AppCompatActivity {
 
     private void onTtsDone() {
         if (!loopActive) return;
+        // защита от двойного вызова: движок присылает onDone, страховочный
+        // таймер — ещё раз; второй вызов включал микрофон посреди нового ответа
+        if (afterAnswer) return;
+        if (android.os.SystemClock.uptimeMillis() - answerStartedAt < 400) return;
+        if (tts != null && tts.isSpeaking()) {
+            armTtsGuard(3000);
+            return;
+        }
         main.removeCallbacks(ttsGuard == null ? () -> { } : ttsGuard);
         answerSpeaking = false;
         busy = false;
@@ -941,6 +992,7 @@ public class AssistantActivity extends AppCompatActivity {
         main.postDelayed(() -> { if (loopActive && !paused && !busy) listenOnce(); }, 350);
         // окно разговора: если за N секунд никто не заговорил — закрываемся
         windowCloseAt = 0;
+        main.removeCallbacks(windowCheck);
         main.postDelayed(windowCheck, Math.max(5, window) * 1000L);
     }
 
@@ -950,6 +1002,7 @@ public class AssistantActivity extends AppCompatActivity {
             if (spokeSinceAnswer) {
                 spokeSinceAnswer = false;
                 // человек снова говорит — окно начинается заново
+                main.removeCallbacks(windowCheck);
                 main.postDelayed(windowCheck,
                         Math.max(5, SettingsStore.talkWindow(AssistantActivity.this)) * 1000L);
                 return;

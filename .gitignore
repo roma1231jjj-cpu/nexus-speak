@@ -1,7 +1,6 @@
 .gradle/
 build/
 app/build/
-gradle/
 local.properties
 *.iml
 .idea/
@@ -9,4 +8,16 @@ local.properties
 captures/
 *.log
 *.apk
-!Nexus.apk
+Nexus.apk
+
+# Gradle wrapper коммитится (jar + properties), скачанные дистрибутивы — нет
+gradle/*
+!gradle/wrapper/
+gradle/wrapper/*
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Ключи подписи и пароли — только локально
+keystore.properties
+*.jks
+*.keystore

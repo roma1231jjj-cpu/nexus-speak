@@ -13,6 +13,7 @@ public class PulseView extends View {
     private long start = -1;
     private int color = Color.WHITE;
     private boolean active = true;
+    private boolean attached = false;
 
     public PulseView(Context c, AttributeSet a) {
         super(c, a);
@@ -20,6 +21,22 @@ public class PulseView extends View {
 
     public void setColor(int c) { color = c; invalidate(); }
     public void setActive(boolean a) { active = a; invalidate(); }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        attached = true;
+        // отсчёт фазы заново: на паузе кольца не должны «прыгать»
+        start = -1;
+        invalidate();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // цикл postInvalidateOnAnimation не должен жить дольше окна
+        attached = false;
+        super.onDetachedFromWindow();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -40,6 +57,6 @@ public class PulseView extends View {
         paint.setAlpha(active ? 200 : 80);
         paint.setStyle(Paint.Style.FILL);
         canvas.drawCircle(cx, cy, base * 0.42f, paint);
-        postInvalidateOnAnimation();
+        if (attached) postInvalidateOnAnimation();
     }
 }

@@ -80,6 +80,7 @@ public class SplashView extends View {
 
     private long t0 = -1;
     private boolean burstInit = false;
+    private boolean attached = false;
     private float w, h, cx, cy, R;
     private DoneListener doneListener;
     private boolean done = false;
@@ -109,7 +110,16 @@ public class SplashView extends View {
             hueColor = paletteLerp(p * BRANDS.length % BRANDS.length);
             postInvalidateOnAnimation();
         });
-        hueAnim.start();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        attached = true;
+        // аниматор живёт только пока вьюха в окне: созданную и забытую вьюху
+        // больше не крутит в фоне
+        if (!hueAnim.isStarted()) hueAnim.start();
+        invalidate();
     }
 
     private int paletteLerp(float idx) {
@@ -157,7 +167,7 @@ public class SplashView extends View {
             done = true;
             if (doneListener != null) doneListener.onSplashDone();
         }
-        postInvalidateOnAnimation();
+        if (attached) postInvalidateOnAnimation();
     }
 
     // phase 1: fly to invisible center with spring-ease + shrink + fade
@@ -436,6 +446,7 @@ public class SplashView extends View {
 
     @Override
     protected void onDetachedFromWindow() {
+        attached = false;
         hueAnim.cancel();
         super.onDetachedFromWindow();
     }

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         stt = findViewById(R.id.sttStatus);
 
         findViewById(R.id.voiceModeBtn).setOnClickListener(v -> {
-            startActivity(new Intent(this, AssistantActivity.class));
+            startActivity(AssistantActivity.internalIntent(this));
             Ui.fadeIn(this);
         });
         findViewById(R.id.chatModeBtn).setOnClickListener(v -> {

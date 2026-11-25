@@ -25,6 +25,13 @@ public final class ModelCatalog {
     public interface Cb { void onDone(List<Info> models, String error); }
 
     public static void fetch(String url, String key, Cb cb) {
+        // Каталог идёт с тем же ключом, что и чат: открытый http:// вне локальной
+        // сети здесь так же недопустим, как и в LlmClient.
+        String insecure = LlmClient.insecureUrl(url);
+        if (insecure != null) {
+            cb.onDone(null, insecure);
+            return;
+        }
         new Thread(() -> {
             List<Info> out = new ArrayList<>();
             try {

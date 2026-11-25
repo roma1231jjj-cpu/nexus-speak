@@ -39,6 +39,8 @@ public class FloatingOrbsView extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Random rnd = new Random();
     private long last = -1;
+    private boolean attached = false;
+    private boolean built = false;
 
     private static final int[] COLORS = {0xFFB57CFF, 0xFF5B8CFF, 0xFFFF5EC8, 0xFF10A37F, 0xFFD97757};
 
@@ -57,25 +59,44 @@ public class FloatingOrbsView extends View {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        attached = true;
+        last = -1;
+        invalidate();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // цикл postInvalidateOnAnimation останавливаем вместе с окном
+        attached = false;
+        super.onDetachedFromWindow();
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
         long now = android.os.SystemClock.uptimeMillis();
         if (last < 0) {
             last = now;
-            int w = getWidth(), h = getHeight();
-            float base = Math.min(w, h);
-            int count = Math.max(5, Math.min(7, logos == null ? 5 : logos.length));
-            for (int i = 0; i < count; i++) {
-                Orb o = new Orb();
-                o.r = base * (0.10f + rnd.nextFloat() * 0.09f);
-                o.x = rnd.nextFloat() * w;
-                o.y = rnd.nextFloat() * h;
-                float sp = base * 0.03f * (0.6f + rnd.nextFloat() * 0.8f);
-                float a = rnd.nextFloat() * 2f * (float) Math.PI;
-                o.vx = (float) Math.cos(a) * sp;
-                o.vy = (float) Math.sin(a) * sp;
-                o.color = COLORS[i % COLORS.length];
-                if (logos != null && i < logos.length) o.logo = logos[i];
-                orbs.add(o);
+            if (!built) {
+                // строим орбы один раз: при повторном attach список не должен расти
+                built = true;
+                int w0 = getWidth(), h0 = getHeight();
+                float base = Math.min(w0, h0);
+                int count = Math.max(5, Math.min(7, logos == null ? 5 : logos.length));
+                for (int i = 0; i < count; i++) {
+                    Orb o = new Orb();
+                    o.r = base * (0.10f + rnd.nextFloat() * 0.09f);
+                    o.x = rnd.nextFloat() * w0;
+                    o.y = rnd.nextFloat() * h0;
+                    float sp = base * 0.03f * (0.6f + rnd.nextFloat() * 0.8f);
+                    float a = rnd.nextFloat() * 2f * (float) Math.PI;
+                    o.vx = (float) Math.cos(a) * sp;
+                    o.vy = (float) Math.sin(a) * sp;
+                    o.color = COLORS[i % COLORS.length];
+                    if (logos != null && i < logos.length) o.logo = logos[i];
+                    orbs.add(o);
+                }
             }
         }
         float dt = Math.min(0.05f, (now - last) / 1000f);
@@ -111,7 +132,7 @@ public class FloatingOrbsView extends View {
                 canvas.drawBitmap(o.logo, null, dst, logoPaint);
             }
         }
-        postInvalidateOnAnimation();
+        if (attached) postInvalidateOnAnimation();
     }
 
     /** обрезаем логотип в круг: квадратные плашки в фоне выглядели мусором */

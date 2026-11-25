@@ -34,6 +34,7 @@ public class GlobeView extends View {
     private static final int STEPS = 44;
 
     private long last = -1;
+    private boolean attached = false;
     private float yaw = 0f;       // continuous spin
     private float pitch = 0.35f;  // rocking tilt
     private float roll = 0f;
@@ -62,6 +63,21 @@ public class GlobeView extends View {
     public void setSpinSpeed(float s) { this.spinSpeed = s; }
     public void setPerspective(boolean p) { this.perspective = p; }
     public void nudge(float dYaw) { this.yaw += dYaw; invalidate(); }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        attached = true;
+        last = -1;          // после паузы dt не должен прыгать
+        invalidate();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // без этого цикл postInvalidateOnAnimation крутился и на скрытой вьюхе
+        attached = false;
+        super.onDetachedFromWindow();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -143,7 +159,7 @@ public class GlobeView extends View {
             }
         }
 
-        postInvalidateOnAnimation();
+        if (attached) postInvalidateOnAnimation();
     }
 
     private interface Shaper { void shape(float[] points); }

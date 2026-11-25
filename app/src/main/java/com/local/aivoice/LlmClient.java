@@ -13,8 +13,30 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LlmClient {
-    /** token usage of the last completed call (bg thread, read right after callback) */
-    public static volatile int lastPromptTokens, lastCompletionTokens;
+    /** usage + model of the last completed call; taken once by CostTracker */
+    public static final class Usage {
+        public final String model;
+        public final int prompt;
+        public final int completion;
+
+        Usage(String model, int prompt, int completion) {
+            this.model = model;
+            this.prompt = prompt;
+            this.completion = completion;
+        }
+    }
+
+    private static final java.util.concurrent.atomic.AtomicReference<Usage> LAST_USAGE =
+            new java.util.concurrent.atomic.AtomicReference<>(null);
+
+    /** Atomically takes the usage of the last call, so two parallel calls cannot mix it. */
+    public static Usage takeUsage() {
+        return LAST_USAGE.getAndSet(null);
+    }
+
+    private static void publishUsage(String model, int prompt, int completion) {
+        LAST_USAGE.set(new Usage(model, prompt, completion));
+    }
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
@@ -43,16 +65,36 @@ public class LlmClient {
         doChat(url, key, model, systemPrompt, messages, imageDataUrl, cb);
     }
 
-    /** Открытый HTTP допустим только для локальной сети — иначе ключ уйдёт в эфир. */
+    /**
+     * Открытый HTTP допустим только для локальной сети — иначе ключ уйдёт в эфир.
+     *
+     * Адрес разбирается как URI, а не как строка: иначе запись вида
+     * http://10.0.0.1:80@evil.com проходила проверку «начинается с частного IP»,
+     * хотя реальным хостом был evil.com. Разбор URI плюс запрет userinfo
+     * закрывают такие адреса, а также IPv6 и нестандартные порты.
+     */
     public static String insecureUrl(String url) {
-        String u = url == null ? "" : url.trim().toLowerCase(java.util.Locale.ROOT);
-        if (!u.startsWith("http://")) return null;
-        String host = u.substring(7);
-        int slash = host.indexOf('/');
-        if (slash >= 0) host = host.substring(0, slash);
-        int colon = host.indexOf(':');
-        if (colon >= 0) host = host.substring(0, colon);
-        if (host.equals("localhost") || host.endsWith(".local") || host.equals("::1")) return null;
+        String raw = url == null ? "" : url.trim();
+        if (raw.isEmpty()) return null;
+        if (!raw.regionMatches(true, 0, "http://", 0, 7)) return null;
+        String host;
+        String authority;
+        try {
+            java.net.URI uri = new java.net.URI(raw);
+            authority = uri.getRawAuthority();
+            host = uri.getHost();
+        } catch (Exception e) {
+            return L.s("Адрес провайдера выглядит битым — нужен вид https://host/api/v1");
+        }
+        if (host == null || host.isEmpty()) {
+            return L.s("В адресе не выделяется хост — нужен вид https://host/api/v1");
+        }
+        if (authority != null && authority.contains("@")) {
+            return L.s("В адресе есть логин или пароль (…@host) — такие адреса не принимаю.");
+        }
+        host = host.toLowerCase(java.util.Locale.ROOT);
+        if (host.equals("localhost") || host.endsWith(".local")
+                || host.equals("::1") || host.equals("0:0:0:0:0:0:0:1")) return null;
         // частные диапазоны 10/8, 172.16/12, 192.168/16, 127/8
         String[] p = host.split("\\.");
         if (p.length == 4) {
@@ -121,8 +163,6 @@ public class LlmClient {
                 JSONObject body = new JSONObject();
                 body.put("model", fModel);
                 body.put("stream", false);
-                lastPromptTokens = -1;
-                lastCompletionTokens = -1;
                 JSONArray msgs = new JSONArray();
                 if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
                     msgs.put(new JSONObject().put("role", "system").put("content", systemPrompt));
@@ -172,8 +212,8 @@ public class LlmClient {
                     try {
                         JSONObject u = root.optJSONObject("usage");
                         if (u != null) {
-                            lastPromptTokens = u.optInt("prompt_tokens", -1);
-                            lastCompletionTokens = u.optInt("completion_tokens", -1);
+                            publishUsage(fModel, u.optInt("prompt_tokens", -1),
+                                    u.optInt("completion_tokens", -1));
                         }
                     } catch (Exception ignored) {
                     }
@@ -215,8 +255,6 @@ public class LlmClient {
                 body.put("stream", true);
                 // просим провайдера прислать usage последним событием — иначе расход не считается
                 body.put("stream_options", new JSONObject().put("include_usage", true));
-                lastPromptTokens = -1;
-                lastCompletionTokens = -1;
                 JSONArray msgs = new JSONArray();
                 if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
                     msgs.put(new JSONObject().put("role", "system").put("content", systemPrompt));
@@ -247,8 +285,10 @@ public class LlmClient {
                     if (!resp.isSuccessful() || resp.body() == null) {
                         String err = "HTTP " + resp.code();
                         if (resp.body() != null) err += ": " + abbrev(resp.body().string());
-                        if (!retried) {
-                            // provider without SSE support -> fall back to a normal call
+                        if (!retried && sseFallbackAllowed(resp.code())) {
+                            // Провайдер не умеет SSE — только такой отказ
+                            // оправдывает второй запрос. На 401/403/429/5xx и
+                            // таймаутах повтор только удваивал расход.
                             chat(url, key, model, systemPrompt, messages, (t, e2) ->
                                     postStream(cb, t, e2));
                             return;
@@ -260,17 +300,19 @@ public class LlmClient {
                             new java.io.InputStreamReader(resp.body().byteStream(),
                                     java.nio.charset.StandardCharsets.UTF_8));
                     String line;
+                    boolean sawEvent = false;
                     while ((line = r.readLine()) != null) {
                         line = line.trim();
                         if (!line.startsWith("data:")) continue;
+                        sawEvent = true;
                         String data = line.substring(5).trim();
                         if (data.isEmpty() || "[DONE]".equals(data)) continue;
                         try {
                             JSONObject o = new JSONObject(data);
                             JSONObject u = o.optJSONObject("usage");
                             if (u != null) {
-                                lastPromptTokens = u.optInt("prompt_tokens", -1);
-                                lastCompletionTokens = u.optInt("completion_tokens", -1);
+                                publishUsage(fModel, u.optInt("prompt_tokens", -1),
+                                        u.optInt("completion_tokens", -1));
                             }
                             JSONArray ch = o.optJSONArray("choices");
                             if (ch == null || ch.length() == 0) continue;
@@ -289,7 +331,9 @@ public class LlmClient {
                     }
                     String out = full.toString().trim();
                     if (out.isEmpty()) {
-                        if (!retried) {
+                        if (!retried && !sawEvent) {
+                            // Совсем не потоковый ответ (провайдер вернул JSON
+                            // вместо SSE) — один обычный запрос вместо тишины.
                             chat(url, key, model, systemPrompt, messages, (t, e2) ->
                                     postStream(cb, t, e2));
                             return;
@@ -299,14 +343,25 @@ public class LlmClient {
                     }
                     postStream(cb, out, null);
                 }
-            } catch (Exception e) {
+            } catch (org.json.JSONException e) {
+                // Битая разметка ответа: провайдер ответил не тем, чем обещал.
                 if (!retried) {
                     chat(url, key, model, systemPrompt, messages, (t, e2) -> postStream(cb, t, e2));
                 } else {
                     postStream(cb, null, abbrev(String.valueOf(e)));
                 }
+            } catch (Exception e) {
+                // Сеть, таймаут, TLS — повтор не поможет, только спишет деньги.
+                postStream(cb, null, LlmClient.friendly(String.valueOf(e)) != null
+                        ? LlmClient.friendly(String.valueOf(e))
+                        : abbrev(String.valueOf(e)));
             }
         }).start();
+    }
+
+    /** Только эти ответы означают «провайдер не понимает stream», а не отказ доступа. */
+    private static boolean sseFallbackAllowed(int code) {
+        return code == 400 || code == 404 || code == 405 || code == 415 || code == 501;
     }
 
     private static void postStream(StreamCb cb, String text, String err) {

@@ -19,9 +19,7 @@ public class AssistantSessionService extends VoiceInteractionSessionService {
 
         @Override
         public void onShow(Bundle args, int showFlags) {
-            Intent intent = new Intent(getContext(), AssistantActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            getContext().startActivity(intent);
+            getContext().startActivity(AssistantActivity.internalIntent(getContext()));
         }
     }
 }

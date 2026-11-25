@@ -21,41 +21,57 @@ import okhttp3.WebSocketListener;
  *
  * Работает по тому же протоколу, что и «Читать вслух» в браузере Edge:
  * WebSocket → конфиг → SSML → mp3 потоком.
+ *
+ * TrustedClientToken больше не зашит в код: старый постоянный ключ сервер
+ * отвергает, а свежий выдаётся только самому клиенту Edge. Поэтому запрос
+ * уходит без него, и если сервер отвечает отказом — возвращаем честную
+ * ошибку, а не пустой «успех».
  */
 final class EdgeTts {
 
-    private static final String TRUSTED_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
+    /** сервер ответил отказом (401/403/404) — это повод не пытаться снова, но не повод врать */
+    static final class Refused extends Exception {
+        final int code;
+        Refused(int code, String message) {
+            super(message);
+            this.code = code;
+        }
+    }
+
     private static final String WS_BASE =
             "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1";
-    /** без Sec-MS-GEC сервер отвечает 403 Forbidden — так было во всех версиях до 1.8.6 */
-    private static final String GEC_VERSION = "1-130.0.2849.68";
 
-    private static String secMsGec() {
-        try {
-            long ticks = System.currentTimeMillis() / 1000L + 11644473600L;
-            ticks -= ticks % 300;
-            ticks *= 10_000_000L;
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] h = md.digest((ticks + TRUSTED_TOKEN).getBytes("US-ASCII"));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : h) sb.append(String.format(java.util.Locale.ROOT, "%02X", b));
-            return sb.toString();
-        } catch (Throwable t) {
-            return "";
-        }
+    /** голос по умолчанию для языка текста */
+    static String defaultVoice(String langTag) {
+        String t = langTag == null ? "" : langTag.toLowerCase(Locale.ROOT);
+        if (t.startsWith("en")) return "en-US-AriaNeural";
+        if (t.startsWith("de")) return "de-DE-KatjaNeural";
+        if (t.startsWith("fr")) return "fr-FR-DeniseNeural";
+        if (t.startsWith("es")) return "es-ES-ElviraNeural";
+        return "ru-RU-SvetlanaNeural";
+    }
+
+    /** https/wss — шифрованные; ws:// допустим только в локальной сети */
+    private static String insecurity(String url) {
+        String u = url == null ? "" : url.trim().toLowerCase(Locale.ROOT);
+        if (u.startsWith("wss://") || u.startsWith("https://")) return null;
+        if (u.startsWith("ws://")) return LlmClient.insecureUrl("http://" + u.substring(5));
+        if (u.startsWith("http://")) return LlmClient.insecureUrl(u);
+        return L.s("Неподдерживаемый адрес синтеза речи");
     }
 
     static byte[] synth(String text, String voice, float speed) throws Exception {
         if (text == null || text.trim().isEmpty()) return null;
         String connectionId = UUID.randomUUID().toString().replace("-", "");
-        String url = WS_BASE + "?TrustedClientToken=" + TRUSTED_TOKEN
-                + "&Sec-MS-GEC=" + secMsGec()
-                + "&Sec-MS-GEC-Version=" + GEC_VERSION
-                + "&ConnectionId=" + connectionId;
+        String url = WS_BASE + "?ConnectionId=" + connectionId;
+        String bad = insecurity(url);
+        if (bad != null) throw new Exception(bad);
 
         final ByteArrayOutputStream audio = new ByteArrayOutputStream();
         final CountDownLatch done = new CountDownLatch(1);
         final String[] error = {null};
+        final int[] refused = {0};
+        final String langTag = langOf(voice, text);
 
         OkHttpClient http = new OkHttpClient.Builder()
                 .connectTimeout(6, TimeUnit.SECONDS)
@@ -76,7 +92,7 @@ final class EdgeTts {
                     @Override public void onOpen(WebSocket webSocket, Response response) {
                         try {
                             webSocket.send(configMessage());
-                            webSocket.send(ssmlMessage(text, voice, speed));
+                            webSocket.send(ssmlMessage(text, voice, speed, langTag));
                         } catch (Throwable t) {
                             error[0] = t.toString();
                             done.countDown();
@@ -106,6 +122,8 @@ final class EdgeTts {
                     }
 
                     @Override public void onFailure(WebSocket webSocket, Throwable t, Response r) {
+                        int code = r == null ? 0 : r.code();
+                        if (code == 401 || code == 403 || code == 404) refused[0] = code;
                         error[0] = t == null ? "соединение" : t.toString();
                         done.countDown();
                     }
@@ -115,10 +133,26 @@ final class EdgeTts {
         try { ws.cancel(); } catch (Throwable ignored) {}
         byte[] out = audio.toByteArray();
         if (out.length > 500) return out;
+        if (refused[0] != 0) {
+            throw new Refused(refused[0], L.s("Edge отклонил запрос (HTTP ") + refused[0] + ")"
+                    + ". Он временно недоступен — выбери другой движок озвучки.");
+        }
         if (!finished || error[0] != null) {
             throw new Exception(error[0] == null ? "нет ответа" : error[0]);
         }
         return out;
+    }
+
+    /** язык для SSML: префикс имени голоса ("en-US-AriaNeural"), иначе язык текста */
+    private static String langOf(String voice, String text) {
+        if (voice != null) {
+            String v = voice.trim();
+            if (v.length() > 6 && v.charAt(2) == '-' && v.indexOf('-', 3) > 3) {
+                return v.substring(0, v.lastIndexOf('-'));
+            }
+        }
+        String tag = TtsSpeaker.languageTag(text);
+        return tag == null ? Locale.getDefault().toLanguageTag() : tag;
     }
 
     private static String stamp() {
@@ -137,7 +171,7 @@ final class EdgeTts {
                 + "\"outputFormat\":\"audio-24khz-48kbitrate-mono-mp3\"}}}}";
     }
 
-    private static String ssmlMessage(String text, String voice, float speed) {
+    private static String ssmlMessage(String text, String voice, float speed, String langTag) {
         String rate = speed >= 1.0f
                 ? "+" + Math.round((speed - 1f) * 100) + "%"
                 : "-" + Math.round((1f - speed) * 100) + "%";
@@ -145,9 +179,9 @@ final class EdgeTts {
                 .replace("<", "&lt;")
                 .replace(">", "&gt;");
         String name = voice == null || voice.trim().isEmpty()
-                ? "ru-RU-SvetlanaNeural" : voice.trim();
+                ? defaultVoice(langTag) : voice.trim();
         String ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
-                + "xml:lang='ru-RU'><voice name='" + name + "'>"
+                + "xml:lang='" + langTag + "'><voice name='" + name + "'>"
                 + "<prosody rate='" + rate + "' pitch='+0Hz'>" + escaped + "</prosody>"
                 + "</voice></speak>";
         return "X-RequestId:" + UUID.randomUUID().toString().replace("-", "") + "\r\n"

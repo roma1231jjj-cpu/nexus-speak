@@ -79,6 +79,21 @@ public class SettingsStore {
     public static String ttsEngine(Context c) { return p(c).getString("ttsEngine", ""); }
 
     /** постоянная память о пользователе (третий промпт, редактируемый) */
+    /**
+     * Секрет процесса для внутренних запусков ассистента. Экран ассистента
+     * экспортирован (иначе система не отдаст ему ASSIST), поэтому текст запроса
+     * принимается только вместе с этим токеном: чужое приложение его не знает.
+     */
+    public static String internalToken(Context c) {
+        SharedPreferences sp = p(c);
+        String token = sp.getString("internalToken", null);
+        if (token == null || token.length() < 16) {
+            token = java.util.UUID.randomUUID().toString();
+            sp.edit().putString("internalToken", token).apply();
+        }
+        return token;
+    }
+
     public static String userInfo(Context c) { return p(c).getString("userInfo", ""); }
 
     public static void setUserInfo(Context c, String v) {

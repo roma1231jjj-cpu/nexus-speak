@@ -32,6 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Runnable sttTimeout;
     private static final int PERMS = 10;
     private static final int IMPORT_RC = 21;
+    private static final int RESTORE_RC = 22;
 
     private EditText urlEt, keyEt, systemEt, userInfoEt;
     private TextView modelSel, textFbSel, visionSel, visionFbSel, templateSel, ttsSel;
@@ -186,10 +187,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.exportBtn).setOnClickListener(v -> exportSettings());
         findViewById(R.id.importBtn).setOnClickListener(v -> {
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            startActivityForResult(Intent.createChooser(i, L.s("Выбери файл настроек")), IMPORT_RC);
+            // SAF-документ: файл копии может лежать где угодно и пережить удаление
+            // приложения (раньше читался только внутренний файл, который стирался).
+            try {
+                startActivityForResult(Backup.pickFileIntent(), RESTORE_RC);
+            } catch (Exception e) {
+                Toast.makeText(this, L.s("Не удалось открыть файл копии: ") + e,
+                        Toast.LENGTH_LONG).show();
+            }
         });
 
         findViewById(R.id.checkUpdateBtn).setOnClickListener(v -> {
@@ -1033,10 +1038,16 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Тихая проверка — только проверка. Раньше каждое открытие настроек при
+     * включённом автообновлении начинало качать ~49 МБ без спроса; теперь
+     * скачивание происходит лишь по нажатию «Проверить обновления».
+     */
     private void checkUpdatesSilently() {
-        UpdateChecker.check(this, (msg, newer, apkUrl, name) -> {
-            updateStatus.setText(msg);
-            if (newer && apkUrl != null) startDownload(apkUrl, name);
+        UpdateChecker.checkOnly(this, (msg, newer, apkUrl, name) -> {
+            updateStatus.setText(newer
+                    ? msg + L.s(" — нажми «Проверить обновления», чтобы скачать")
+                    : msg);
         });
     }
 
@@ -1357,8 +1368,9 @@ public class SettingsActivity extends AppCompatActivity {
     private void showCapabilities() {
         StringBuilder sb = new StringBuilder();
         sb.append(mark(perm(Manifest.permission.RECORD_AUDIO))).append(L.s(" Микрофон (слушать)\n"));
-        sb.append(mark(perm(Manifest.permission.CALL_PHONE))).append(L.s(" Звонки\n"));
-        sb.append(mark(perm(Manifest.permission.SEND_SMS))).append(" SMS\n");
+        // Звонок и SMS приложение не выполняет само: открывает звонилку или
+        // редактор с готовым текстом, отправляет человек. Разрешения не нужны.
+        sb.append("✓").append(L.s(" Звонки и SMS: только звонилка/редактор, отправляешь ты\n"));
         sb.append(mark(perm(Manifest.permission.READ_CONTACTS))).append(L.s(" Контакты\n"));
         sb.append(mark(perm(Manifest.permission.ACCESS_FINE_LOCATION))).append(L.s(" Геолокация\n"));
         sb.append(mark(perm(Manifest.permission.POST_NOTIFICATIONS))).append(L.s(" Свои уведомления\n"));
@@ -1419,8 +1431,6 @@ public class SettingsActivity extends AppCompatActivity {
     private void requestPerms() {
         String[] perms = {
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.CALL_PHONE,
-                Manifest.permission.SEND_SMS,
                 Manifest.permission.READ_CONTACTS,
                 Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.READ_PHONE_STATE,
@@ -1801,6 +1811,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESTORE_RC) {
+            if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
+            String report = Backup.restoreFrom(this, data.getData());
+            Toast.makeText(this, report, Toast.LENGTH_LONG).show();
+            recreate();
+            return;
+        }
         if (requestCode == IMPORT_RC && resultCode == RESULT_OK && data != null) {
             try {
                 StringBuilder sb = new StringBuilder();

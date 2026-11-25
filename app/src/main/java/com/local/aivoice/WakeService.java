@@ -304,7 +304,7 @@ public class WakeService extends Service {
 
     /** один-единственный слушатель на всё время работы сервиса */
     private final RecognitionListener wakeListener = new RecognitionListener() {
-            @Override public void onBeginningOfSpeech() { }
+            @Override public void onBeginningOfSpeech() { lastSignal = System.currentTimeMillis(); }
             @Override public void onRmsChanged(float r) { }
             @Override public void onBufferReceived(byte[] b) { }
             @Override public void onEndOfSpeech() {
@@ -316,9 +316,11 @@ public class WakeService extends Service {
                 // держим тишину: «дзынь» старта играет сразу после startListening
             }
             @Override public void onPartialResults(Bundle p) {
+                lastSignal = System.currentTimeMillis();
                 handleUtterance(p.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION), true);
             }
             @Override public void onResults(Bundle p) {
+                lastSignal = System.currentTimeMillis();
                 BeepMuter.muteFor(WakeService.this, 1200, false);
                 recognizing = false;
                 boolean wake = handleUtterance(
@@ -387,11 +389,20 @@ public class WakeService extends Service {
         return false;
     }
 
+    /**
+     * Ищем обращение по словам, а не по подстроке: раньше «нексус» внутри любого
+     * слова («анекдоты», «контекст») поднимал ассистента. Теперь слово должно
+     * начинаться с обращения, допускается падежное окончание.
+     */
     private boolean containsWake(String low) {
-        for (String w : WAKE_WORDS) {
-            if (low.contains(w)) return true;
-            // «нексус» часто распознаётся как «нексус» / «некси» / «нексу»
-            if (w.length() > 5 && low.contains(w.substring(0, w.length() - 1))) return true;
+        String[] tokens = low.split("[^\\p{L}\\p{N}]+");
+        for (String token : tokens) {
+            if (token.isEmpty()) continue;
+            for (String w : WAKE_WORDS) {
+                if (token.equals(w) || token.startsWith(w)) return true;
+                // «нексус» распознаётся и как «нексу», «некси» — сравниваем основу
+                if (w.length() > 5 && token.startsWith(w.substring(0, w.length() - 1))) return true;
+            }
         }
         return false;
     }
@@ -419,8 +430,7 @@ public class WakeService extends Service {
 
     /** С Android 10 фон не может просто так показать окно: нужен оверлей или full-screen intent. */
     private void openAssistant(String prequery) {
-        Intent i = new Intent(this, AssistantActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        Intent i = AssistantActivity.internalIntent(this);
         i.putExtra(EXTRA_TEXT, prequery);
         // с видимым оверлеем Android 10+ не блокирует запуск окна из фона
         attachAnchor();

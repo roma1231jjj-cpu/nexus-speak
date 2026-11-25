@@ -66,7 +66,7 @@ public class ChatActivity extends AppCompatActivity {
         scrim.setOnClickListener(v -> closeSheet());
         findViewById(R.id.sheetTalkBtn).setOnClickListener(v -> {
             closeSheet();
-            startActivity(new Intent(this, AssistantActivity.class));
+            startActivity(AssistantActivity.internalIntent(this));
             Ui.fadeIn(this);
         });
         findViewById(R.id.chatNewBtn).setOnClickListener(v -> newDialog());
@@ -84,7 +84,7 @@ public class ChatActivity extends AppCompatActivity {
         findViewById(R.id.chatSettingsBtn).setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class)));
         findViewById(R.id.chatMicBtn).setOnClickListener(v -> {
-            startActivity(new Intent(this, AssistantActivity.class));
+            startActivity(AssistantActivity.internalIntent(this));
             Ui.fadeIn(this);
         });
         findViewById(R.id.chatSendBtn).setOnClickListener(v -> send());

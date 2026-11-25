@@ -15,6 +15,8 @@ A voice assistant for Android that talks to **your own** AI provider. Wake word,
 
 - [Install](#install)
 - [Keys and privacy](#keys-and-privacy)
+- [Update integrity](#update-integrity)
+- [Settings backup](#settings-backup)
 - [Supported providers](#supported-providers-openai-compatible)
 - [How to call it](#how-to-call-it)
 - [Features](#features)
@@ -28,17 +30,55 @@ A voice assistant for Android that talks to **your own** AI provider. Wake word,
 
 1. Download **Nexus.apk** from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest).
 2. Allow installs from unknown sources and install the APK.
-3. Android 13+. The app starts on Android 8–12, but some features (wake word on top of other apps, call screening) need 13.
+3. Android 13 or newer (`minSdk 33`). On Android 8–12 the APK will not install at all: the system refuses a build that requires API 33.
 4. Open **Settings → “Choose provider”** → pick one from the list or type your own base URL → paste your API key.
 5. Models and prices load automatically. Tap **“Make default assistant”**.
 
-Updates arrive on their own: the app reads `update.json` from this repository, asks permission, shows progress and asks you to confirm the install.
+Updates are checked against `update.json` in this repository but are **never downloaded silently**: the version check only reports that a build exists, and the file is fetched after you press “Download”. Both the checksum and the signature are verified — see [Update integrity](#update-integrity).
 
 ## Keys and privacy
 
 This build ships **no API key and no default provider** — only app code.
 You enter the key yourself; it is stored in the app's private preferences on the phone.
 The app sends nothing anywhere except to the provider you chose.
+
+## Update integrity
+
+`update.json` in the repository root is the only update manifest:
+
+```json
+{
+  "versionCode": 59,
+  "versionName": "1.10.6",
+  "apkUrl": "https://…/Nexus.apk",
+  "sha256": "64 hex characters — SHA-256 of the APK",
+  "notes": "what's new"
+}
+```
+
+What the app does:
+
+- the version check (silent check on opening settings, or the “Check for updates” button) **never starts a download**;
+- the APK (about 11 MB today) is fetched only after an explicit “Download” tap;
+- SHA-256 is computed while the file is written and compared with `sha256` from the manifest. On mismatch the file is deleted and the update is cancelled with an error. A missing or malformed `sha256` means no update is offered at all (“обновление без контрольной суммы не устанавливаю” — I don't install updates without a checksum);
+- before installing, the SHA-256 of the APK signing certificate is compared with the signature of the installed app (`PackageManager.getPackageInfo(…, GET_SIGNING_CERTIFICATES)`). A foreign, re-signed or broken APK is refused;
+- installation goes through a `PackageInstaller` session, the final confirmation is the system one.
+
+Check it yourself:
+
+```bash
+sha256sum Nexus.apk                        # compare with "sha256" in update.json
+apksigner verify --print-certs Nexus.apk   # which key signed the file
+```
+
+## Settings backup
+
+The app keeps two copies of your settings:
+
+- `files/settings-backup.json` — complete, inside the app's private storage. Survives an update, disappears with the app, so it is not the only way back;
+- `Downloads/Nexus Speak/nexus-settings-backup.json` — stripped copy: **no API keys, tokens, sessions and no personal data** (`userInfo`, the auto-answer greeting and chat history are never written there). That file is safe to send or show.
+
+Restore reads a file you pick: the system SAF dialog (`ACTION_OPEN_DOCUMENT`, `application/zip` or any file) returns a JSON or a ZIP containing the backup, read through `ContentResolver`, so the app needs no access to your whole Downloads folder. The chosen file is remembered and after a reinstall the app tries it again on its own.
 
 ## Supported providers (OpenAI-compatible)
 
@@ -74,6 +114,7 @@ Wake-word pronunciations understood: `нэксус`, `нексус`, `нэкси
 ### Phone control
 - Open apps and links, search the web.
 - Flashlight, volume, alarms and timers, calls and SMS, contacts.
+- **Neither a call nor an SMS is ever sent silently**: Nexus opens the system dialer (`ACTION_DIAL`) or the messaging composer (`smsto:`) with the number and the ready text filled in — you confirm and send.
 - Screen reading (screenshot → vision model): “what's on the screen?”.
 - Weather, rates, news — through the built-in web tool.
 
@@ -107,13 +148,44 @@ Plus **AMOLED** — pure black on top of Midnight. Colours live in theme attribu
 
 ## Build from source
 
+The Gradle wrapper is committed (`gradle/wrapper/gradle-wrapper.jar`, Gradle 8.7), so you only need JDK 17+ and the Android SDK. The `gradlew`/`gradlew.bat` scripts are not in the repository, so run the wrapper directly:
+
 ```bash
-cd app
-gradle wrapper --gradle-version 8.10   # once
-./gradlew assembleRelease
+# debug build, signed with the debug key
+java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain assembleDebug
+
+# release build, needs your own signing key (below)
+java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain assembleRelease
+
+# or, with Gradle 8.7+ installed
+gradle assembleRelease
 ```
 
-Java only, no Compose. `minSdk 24` for the helper builds, release targets Android 13+ (`minSdk 33`, `targetSdk 34`). The release APK is signed with a local keystore provided through `gradle.properties`; without it the build produces an unsigned artifact.
+Java only, no Compose. `minSdk 33`, `targetSdk 34`. The `-Plowapi` flag lowers `minSdk` to 28 for an old emulator and screenshots only — never for a release.
+
+Repository layout: `app/` — the Android app (code in `app/src/main/java/com/local/aivoice`), `docs/` — screenshots, `update.json` — the auto-update manifest.
+
+### Signed release
+
+A release is signed only with your own key: signing a release with the debug key is forbidden, and without a key the build fails with “Нет ключа подписи” (no signing key).
+
+```bash
+keytool -genkeypair -v -keystore nexus-release.jks -alias nexus \
+  -keyalg RSA -keysize 4096 -validity 10000
+```
+
+`keystore.properties` in the project root (listed in `.gitignore`, never committed):
+
+```properties
+storeFile=nexus-release.jks
+storePassword=…
+keyAlias=nexus
+keyPassword=…
+```
+
+Environment variables work too: `NEXUS_KEYSTORE`, `NEXUS_KEYSTORE_PASSWORD`, `NEXUS_KEY_ALIAS`, `NEXUS_KEY_PASSWORD`. The APK lands in `app/build/outputs/apk/release/`.
+
+**The APK attached to the releases of this repository is signed with a debug key** — it is a side-loaded build, not a Play Store one. An update from `update.json` only installs over an app with the same signature, so build your fork with your own key.
 
 ## Limitations (honest list)
 

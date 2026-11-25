@@ -100,12 +100,29 @@ public final class ScreenGrab {
 
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
+            // START_STICKY после смерти процесса приходит с intent == null,
+            // а данных проекции в нём и не было. Такой запуск бессмысленен:
+            // раньше он падал на intent.getIntExtra и валил экран.
+            if (intent == null) {
+                CountDownLatch l = pendingLatch;
+                pendingLatch = null;
+                if (l != null) l.countDown();
+                stopSelf();
+                return START_NOT_STICKY;
+            }
             int code = intent.getIntExtra("code", -1);
             Intent data;
             if (android.os.Build.VERSION.SDK_INT >= 33) {
                 data = intent.getParcelableExtra("data", Intent.class);
             } else {
                 data = intent.getParcelableExtra("data");
+            }
+            if (code < 0 || data == null) {
+                CountDownLatch l = pendingLatch;
+                pendingLatch = null;
+                if (l != null) l.countDown();
+                stopSelf();
+                return START_NOT_STICKY;
             }
             if (!startForegroundSafe()) {
                 CountDownLatch l0 = pendingLatch;
@@ -134,7 +151,9 @@ public final class ScreenGrab {
             CountDownLatch l = pendingLatch;
             pendingLatch = null;
             if (l != null) l.countDown();
-            return START_STICKY;
+            // Проекция живёт только пока мы её держим. После перезапуска процесса
+            // восстановить её нельзя, поэтому сервис не просит Android поднимать его снова.
+            return START_NOT_STICKY;
         }
 
         /** На Android 14 без типа mediaProjection сервис падает */
