@@ -174,11 +174,15 @@ public final class UpdateChecker {
             return;
         }
         synchronized (UpdateChecker.class) {
-            if (downloading) return;
+            if (downloading) {
+                postError(cb, name, L.s("Скачивание уже идёт — дождись его окончания"));
+                return;
+            }
             downloading = true;
         }
         new Thread(() -> {
             File out = new File(c.getFilesDir(), "update.apk");
+            File tmp = new File(c.getFilesDir(), "update.tmp");
             try {
                 OkHttpClient http = new OkHttpClient.Builder()
                         .connectTimeout(30, TimeUnit.SECONDS)
@@ -187,12 +191,14 @@ public final class UpdateChecker {
                 try (Response r = http.newCall(req).execute()) {
                     if (!r.isSuccessful() || r.body() == null) throw new Exception("HTTP " + r.code());
                     long total = r.body().contentLength();
-                    if (out.exists() && !out.delete()) throw new Exception("не удалось убрать прошлый файл");
+                    // Пишем во временный файл: прошлая рабочая копия не пропадёт,
+                    // если сеть оборвётся или хеш не совпадёт.
+                    if (tmp.exists() && !tmp.delete()) throw new Exception("не удалось убрать прошлый временный файл");
                     InputStream in = r.body().byteStream();
                     MessageDigest md = MessageDigest.getInstance("SHA-256");
                     long done = 0;
                     int lastPct = -1;
-                    try (FileOutputStream fos = new FileOutputStream(out)) {
+                    try (FileOutputStream fos = new FileOutputStream(tmp)) {
                         byte[] buf = new byte[65536];
                         int n;
                         while ((n = in.read(buf)) > 0) {
@@ -210,22 +216,28 @@ public final class UpdateChecker {
                     }
                     String actual = hex(md.digest());
                     if (!expected.equals(actual)) {
-                        deleteQuietly(out);
+                        deleteQuietly(tmp);
                         postDone(cb, null, name, L.s("Контрольная сумма не совпала — файл удалён, "
                                 + "обновление отменено (ожидалось ") + shortHash(expected)
                                 + L.s(", получено ") + shortHash(actual) + ")");
                         return;
                     }
-                    if (out.length() < MIN_APK_BYTES) {
-                        deleteQuietly(out);
+                    if (tmp.length() < MIN_APK_BYTES) {
+                        deleteQuietly(tmp);
                         postDone(cb, null, name, L.s("Скачанный файл слишком мал — обновление отменено"));
                         return;
                     }
+                    if (out.exists() && !out.delete()) throw new Exception("не удалось заменить прошлый APK");
+                    if (!tmp.renameTo(out)) throw new Exception("не удалось сохранить скачанный APK");
                     postDone(cb, out, name, null);
                 }
             } catch (Exception e) {
-                deleteQuietly(out);
+                deleteQuietly(tmp);
                 postDone(cb, null, name, String.valueOf(e));
+            } finally {
+                // Без сброса флага следующее скачивание после ошибки/успеха
+                // молча не запускалось до перезапуска приложения.
+                synchronized (UpdateChecker.class) { downloading = false; }
             }
         }).start();
     }

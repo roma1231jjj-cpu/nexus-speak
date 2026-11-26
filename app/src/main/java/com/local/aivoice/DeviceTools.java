@@ -176,8 +176,11 @@ public final class DeviceTools {
                 Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
                 for (android.content.pm.ResolveInfo ri : pm.queryIntentActivities(main, 0)) {
                     String label = ri.loadLabel(pm).toString().toLowerCase(java.util.Locale.ROOT);
-                    boolean hit = label.equals(name) || label.startsWith(name)
-                            || name.startsWith(label) && label.length() >= 2
+                    // Короткие имена («вк», «vk») ищем только точно: иначе
+                    // «ка» открывала «Камеру», а «ми» — «Микрофон».
+                    boolean hit = label.equals(name)
+                            || (name.length() >= 3 && label.startsWith(name))
+                            || (label.length() >= 3 && name.startsWith(label))
                             || (" " + label + " ").contains(" " + name + " ");
                     if (!hit) continue;
                     Intent i = pm.getLaunchIntentForPackage(ri.activityInfo.packageName);

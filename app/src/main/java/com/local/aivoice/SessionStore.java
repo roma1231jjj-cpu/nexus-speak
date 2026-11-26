@@ -69,10 +69,15 @@ public final class SessionStore {
     private static String clean(String text) {
         if (text == null) return "";
         String out = text.trim();
-        while (out.startsWith("null")) out = out.substring(4).trim();
-        while (out.endsWith("null")) out = out.substring(0, out.length() - 4).trim();
-        if ("null".equals(out)) return "";
-        return out;
+        // «null» — отдельный служебный токен, а не начало слова «nullable»
+        while (out.startsWith("null") && (out.length() == 4 || !Character.isLetterOrDigit(out.charAt(4)))) {
+            out = out.substring(4).trim();
+        }
+        while (out.endsWith("null")
+                && (out.length() == 4 || !Character.isLetterOrDigit(out.charAt(out.length() - 5)))) {
+            out = out.substring(0, out.length() - 4).trim();
+        }
+        return "null".equals(out) ? "" : out;
     }
 
     private static String newId() {

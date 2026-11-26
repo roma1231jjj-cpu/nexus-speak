@@ -1,8 +1,1 @@
-{
-  "versionCode": 59,
-  "versionName": "1.10.6",
-  "apkUrl": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk",
-  "sha256": "b747c2edf523758714391457b5a2a71bdf7e1ed36e66f067108832301d730e4c",
-  "notes": "1.10.6: безопасность и деньги. Звонок и SMS больше не уходят без тебя — приложение открывает звонилку/редактор с готовым текстом. Команды из чужих страниц, уведомлений и скриншотов не выполняются (prompt injection). Чужое приложение не может передать текст ассистенту: нужен внутренний токен. Обновление проверяется по SHA-256 и подписи, тихая проверка больше не качает 49 МБ. adb/Edge: бесплатный голос по умолчанию, английский текст читается английским голосом, «объясни заново» больше не стирает диалог.",
-  "url": "https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk"
-}
+{"versionCode":60,"versionName":"1.10.7","apkUrl":"https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk","sha256":"7db722ad13b65ff5dcf96f2ef935ca9b968e292626a45dc17543f5245135d9b3","notes":"1.10.7: иконка снова открывает главный экран; очистка истории не калечит слова вроде «nullable»; две озвучки не перетирают общий файл; скачивание APK идёт во временный файл, флаг загрузки сбрасывается; «забудь» умеет убирать отдельную фразу; release без ключа падает с понятной ошибкой.","url":"https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest/download/Nexus.apk"}

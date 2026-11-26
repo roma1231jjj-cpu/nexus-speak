@@ -90,7 +90,8 @@ public class SplashActivity extends AppCompatActivity {
                 .putBoolean(SKIP_KEY, true)
                 .putLong("lastSplash", System.currentTimeMillis())
                 .apply();
-        Intent i = new Intent(this, ChatActivity.class);
+        // иконка должна открывать главный экран, а не сразу чат
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

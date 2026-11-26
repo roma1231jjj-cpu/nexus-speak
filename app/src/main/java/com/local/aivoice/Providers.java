@@ -33,7 +33,7 @@ public final class Providers {
             new P("Together AI", "https://api.together.xyz/v1", "https://api.together.ai/settings/api-keys", "openai.png"),
             new P("Google Gemini", "https://generativelanguage.googleapis.com/v1beta/openai",
                     "https://aistudio.google.com/apikey", "gemini.png"),
-            new P(L.s("Локальный сервер (LM Studio / Ollama)"), "http://192.168.1.2:1234/v1", null, null),
+            new P("Local server (LM Studio / Ollama)", "http://192.168.1.2:1234/v1", null, null),
     };
 
     public static P byUrl(String url) {

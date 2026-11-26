@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "AiVoiceAssistant"
+rootProject.name = "NexusSpeak"
 include(":app")

@@ -19,6 +19,25 @@ public final class Memory {
         if ("show".equals(mode) || text.isEmpty()) {
             return cur.isEmpty() ? "Память пуста." : "В памяти: " + cur;
         }
+        if ("forget".equals(mode)) {
+            // Частичное забывание: убираем только фразы с указанным текстом,
+            // остальные факты остаются. Раньше «забудь» стирало всю память.
+            String needle = text.toLowerCase(java.util.Locale.ROOT);
+            String[] parts = cur.split("(?<=[.!?])\s+");
+            StringBuilder keep = new StringBuilder();
+            int removed = 0;
+            for (String part : parts) {
+                if (part.toLowerCase(java.util.Locale.ROOT).contains(needle)) {
+                    removed++;
+                } else if (part.trim().length() > 0) {
+                    if (keep.length() > 0) keep.append(' ');
+                    keep.append(part.trim());
+                }
+            }
+            if (removed == 0) return "В памяти нет фразы: " + text;
+            SettingsStore.setUserInfo(c, keep.toString().trim());
+            return "Забыл: " + text;
+        }
         if (text.length() > 300) text = text.substring(0, 300);
 
         String lowCur = cur.toLowerCase(java.util.Locale.ROOT);

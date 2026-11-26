@@ -413,7 +413,8 @@ public class CloudTts {
 
     private boolean play(byte[] audio) {
         try {
-            File f = new File(ctx.getCacheDir(), "tts-cloud.mp3");
+            // уникальный файл: два одновременных ответа больше не перетирают озвучку
+            File f = File.createTempFile("tts-", ".mp3", ctx.getCacheDir());
             try (FileOutputStream out = new FileOutputStream(f)) {
                 out.write(audio);
             }
@@ -439,6 +440,7 @@ public class CloudTts {
             if (cancelled) {
                 mp.release();
                 player = null;
+                f.delete();
                 return false;
             }
             // v1.9.3: без плавного входа и выхода MediaPlayer щёлaет в динамик
@@ -450,6 +452,7 @@ public class CloudTts {
             done.await(120, TimeUnit.SECONDS);
             playLatch = null;
             player = null;
+            f.delete();
             return !cancelled;
         } catch (Throwable t) {
             player = null;
