@@ -39,8 +39,8 @@ android {
         // -Plowapi — только для сборки под старый эмулятор (скриншоты), релиз всегда 33
         minSdk = if (project.hasProperty("lowapi")) 28 else 33
         targetSdk = 34
-        versionCode = 60
-        versionName = "1.10.7"
+        versionCode = 61
+        versionName = "1.10.8"
         buildFeatures { buildConfig = true }
         buildConfigField("boolean", "SAFE_MODE",
                 if (project.hasProperty("safe")) "true" else "false")

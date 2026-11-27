@@ -96,7 +96,9 @@ public final class UpdateChecker {
                 OkHttpClient http = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(30, TimeUnit.SECONDS).build();
-                Request req = new Request.Builder().url(SettingsStore.updateUrl(c)).build();
+                String feed = SettingsStore.updateUrl(c);
+                if (!isHttpsUrl(feed)) throw new Exception(L.s("адрес обновлений должен быть https"));
+                Request req = new Request.Builder().url(feed).build();
                 try (Response r = http.newCall(req).execute()) {
                     if (!r.isSuccessful() || r.body() == null)
                         throw new Exception("HTTP " + r.code());
@@ -171,6 +173,10 @@ public final class UpdateChecker {
         }
         if (apkUrl == null || apkUrl.trim().isEmpty()) {
             postError(cb, name, L.s("Нет ссылки на APK в update.json"));
+            return;
+        }
+        if (!isHttpsUrl(apkUrl)) {
+            postError(cb, name, L.s("Ссылка на APK должна быть https — обновление отменено"));
             return;
         }
         synchronized (UpdateChecker.class) {
@@ -503,6 +509,21 @@ public final class UpdateChecker {
 
     private static void postError(DownloadCb cb, String name, String err) {
         new Handler(Looper.getMainLooper()).post(() -> cb.onDone(null, name, err));
+    }
+
+    /**
+     * Обновление скачивается только по https. http и userinfo-трюк
+     * (https://good@evil) отсекаются до сетевого запроса; host обязателен.
+     */
+    private static boolean isHttpsUrl(String raw) {
+        try {
+            Uri u = Uri.parse(raw == null ? "" : raw.trim());
+            return "https".equalsIgnoreCase(u.getScheme())
+                    && u.getHost() != null && !u.getHost().isEmpty()
+                    && u.getUserInfo() == null;
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     private static boolean isSha256(String s) {

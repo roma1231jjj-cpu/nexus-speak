@@ -80,13 +80,25 @@ public final class App extends Application {
     }
 
     private final android.os.Handler bg = new android.os.Handler(android.os.Looper.getMainLooper());
-    private final Runnable doBackup = () -> {
+    private long lastBackupAt = 0L;
+    private final Runnable doBackup = this::backupNow;
+
+    private void backupNow() {
+        // Настройки меняются пачками (тема, голос, провайдер). Писать файл в
+        // «Загрузки» на каждое изменение — лишний износ и риск показать
+        // недописанный JSON; держим не чаще одного раза в минуту.
+        long now = System.currentTimeMillis();
+        if (now - lastBackupAt < 60_000L) {
+            bg.postDelayed(doBackup, 60_000L - (now - lastBackupAt));
+            return;
+        }
+        lastBackupAt = now;
         try { Backup.save(this); } catch (Throwable ignored) {}
-    };
+    }
 
     private void scheduleBackup() {
         bg.removeCallbacks(doBackup);
-        bg.postDelayed(doBackup, 2500);
+        bg.postDelayed(doBackup, 10_000);
     }
 
     private void copyToDownloads(String text) {

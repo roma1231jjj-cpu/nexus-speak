@@ -28,7 +28,7 @@
 
 **Install:** download `Nexus.apk` from [Releases](https://github.com/roma1231jjj-cpu/nexus-speak/releases/latest), allow installation from unknown sources, install, then open Settings → provider → paste your API key. It requires Android 13 or newer (`minSdk 33`); on Android 8–12 the APK does not install.
 
-**Privacy:** the app talks only to the provider you configure and to the TTS service you pick. Keys stay in the app's private preferences on the phone.
+**Privacy:** the app talks only to the LLM provider you configure and to the TTS engine selected in Settings. Cloud TTS is on by default: answer text is sent to the free Google Translate voice; pick the system voice for offline speech. Keys stay in the app's private preferences on the phone (Android SharedPreferences, not hardware-encrypted).
 
 **Screenshots above** are the app itself: Settings in Midnight, Settings in Frost and the main screen in Graphite, interface switched to English.
 
@@ -52,7 +52,7 @@ The rest of this README is in Russian — ask in the issues if you need an Engli
 
 В этой сборке **нет ни API-ключа, ни провайдера по умолчанию** — только код приложения.
 Ключ вводится вами в настройках и лежит в приватных настройках приложения на телефоне.
-Приложение не отправляет данные никуда, кроме выбранного вами провайдера. Если включена облачная озвучка (по умолчанию — бесплатный Google-переводчик), текст ответа уходит в сервис озвучки; системный голос работает без сети. Выбор голоса и облака виден в настройках.
+Приложение отправляет данные только выбранному вами LLM-провайдеру и в выбранный движок озвучки. Облачная озвучка включена по умолчанию: текст ответа уходит в бесплатный Google-переводчик; системный голос работает без сети. Ключи лежат в приватных `SharedPreferences` приложения, без аппаратного шифрования Android Keystore. Выбор голоса и облака виден в настройках.
 
 ## Поддерживаемые провайдеры (OpenAI-совместимые)
 
@@ -68,8 +68,8 @@ Polza.ai · OpenRouter · OpenAI · DeepSeek · Groq · Mistral · Together AI �
 
 ```json
 {
-  "versionCode": 60,
-  "versionName": "1.10.7",
+  "versionCode": 61,
+  "versionName": "1.10.8",
   "apkUrl": "https://…/Nexus.apk",
   "sha256": "64 шестнадцатеричных символа — SHA-256 от APK",
   "notes": "что нового"
@@ -80,6 +80,7 @@ Polza.ai · OpenRouter · OpenAI · DeepSeek · Groq · Mistral · Together AI �
 
 - проверка версии (`versionCode`) **ничего не скачивает** — и тихая проверка при открытии настроек, и кнопка «Проверить обновления» только показывают результат;
 - APK (сейчас около 11 МБ) скачивается только после явного «Скачать»;
+- и манифест, и ссылка на APK принимаются только по `https`; `http` и userinfo-трюк вроде `https://good@evil` отсекаются до запроса;
 - SHA-256 считается по ходу записи файла и сверяется с `sha256` из манифеста. Не совпало — файл удаляется, обновление отменяется с текстом ошибки. Поля `sha256` нет или оно битое — обновление вообще не предлагается («обновление без контрольной суммы не устанавливаю»);
 - перед установкой SHA-256 сертификата APK сверяется с подписью установленного приложения (`PackageManager.getPackageInfo(…, GET_SIGNING_CERTIFICATES)`). Чужой, переподписанный или битый APK не устанавливается;
 - установка идёт через сессию `PackageInstaller`, финальное подтверждение — системное.
@@ -96,7 +97,7 @@ apksigner verify --print-certs Nexus.apk   # каким ключом подпи�
 Приложение пишет две копии настроек:
 
 - `files/settings-backup.json` — полная, в приватной папке приложения. Переживает обновление, но исчезает вместе с приложением, поэтому не единственный путь восстановления;
-- `Загрузки/Nexus Speak/nexus-settings-backup.json` — обезличенная копия: **без API-ключей, токенов и сессий и без личных данных** (`userInfo`, приветствие автоответчика, история диалогов туда не попадают). Такой файл не стыдно переслать или показать.
+- `Загрузки/Nexus Speak/nexus-settings-backup.json` — обезличенная копия: **без API-ключей, токенов и сессий и без личных данных** (`userInfo`, приветствие автоответчика, история диалогов туда не попадают). Такой файл не стыдно переслать или показать. Копия пишется не на каждое изменение настроек, а не чаще раза в минуту.
 
 Восстановление — из выбранного файла: системный диалог SAF (`ACTION_OPEN_DOCUMENT`, `application/zip` или любой файл) отдаёт JSON или ZIP с копией внутри, читается он через `ContentResolver`, поэтому доступ ко всем «Загрузкам» приложению не нужен. Ранее выбранный файл запоминается, и после переустановки приложение пробует восстановиться из него само.
 
